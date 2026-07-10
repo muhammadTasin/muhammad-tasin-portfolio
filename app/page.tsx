@@ -547,7 +547,7 @@ export default function Home() {
 
         <section className="section architecture-section">
           <div className="container architecture-card" data-reveal>
-            <div className="architecture-copy"><span className="eyebrow">HOW I BUILD</span><h2>Useful AI starts<br /><em>before the prompt.</em></h2><p>I design the product flow, backend context, validation and fallback paths around the model—so the experience stays useful across web and mobile.</p></div>
+            <div className="architecture-copy"><span className="eyebrow">HOW I BUILD</span><h2>Useful AI starts<br /><em>before the prompt.</em></h2><p>I design product flows, backend context, validation and fallback paths around the model—so experiences stay useful across web and mobile.</p></div>
             <div className="system-map" aria-label="AI product architecture"><div className="system-node primary"><span>01</span><strong>Product experience</strong><small>Web · Mobile · User flows</small></div><div className="system-line"><span>validated request</span></div><div className="system-node"><span>02</span><strong>Backend foundation</strong><small>APIs · Auth · Database</small></div><div className="system-line"><span>structured context</span></div><div className="system-node accent"><span>03</span><strong>Reliable intelligence</strong><small>LLM · RAG · Validation · Fallbacks</small></div></div>
           </div>
         </section>
