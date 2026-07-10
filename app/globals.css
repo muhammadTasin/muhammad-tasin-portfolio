@@ -150,3 +150,123 @@ img { display: block; max-width: 100%; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
   .motion-ready [data-reveal] { opacity:1; transform:none; }.button:hover,.project-card:hover,.project-card:hover .visual-frame{transform:none}
 }
+
+/* Hackathon Highlight Card & Marquee */
+.buildfest-showcase {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.15fr 1.85fr;
+  min-height: 380px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 30px;
+  background: var(--surface);
+  margin-top: 10px;
+  margin-bottom: 10px;
+  gap: 40px;
+  padding: 40px;
+  align-items: center;
+}
+
+.buildfest-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.buildfest-content h3 {
+  font-size: 2.1rem;
+  letter-spacing: -.05em;
+  margin: 0;
+  line-height: 1.15;
+}
+
+.buildfest-content p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.72;
+  margin: 0;
+}
+
+.buildfest-marquee-container {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--surface-2) 40%, var(--bg));
+  border: 1px solid var(--line);
+  height: 300px;
+  display: flex;
+  align-items: center;
+  padding: 0 15px;
+}
+
+.buildfest-marquee {
+  display: flex;
+  gap: 20px;
+  width: max-content;
+  animation: scroll-left-to-right 30s linear infinite;
+}
+
+.buildfest-marquee img {
+  width: 380px;
+  height: 250px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  flex-shrink: 0;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+  transition: transform 0.3s ease;
+}
+
+.buildfest-marquee img:hover {
+  transform: scale(1.02);
+}
+
+@keyframes scroll-left-to-right {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0%);
+  }
+}
+
+@media (max-width: 960px) {
+  .buildfest-showcase {
+    grid-template-columns: 1fr;
+    padding: 30px;
+    gap: 30px;
+    min-height: auto;
+  }
+  .buildfest-marquee-container {
+    height: 240px;
+  }
+  .buildfest-marquee img {
+    width: 280px;
+    height: 190px;
+  }
+}
+
+@media (max-width: 480px) {
+  .buildfest-showcase {
+    padding: 20px;
+    border-radius: 21px;
+  }
+  .buildfest-content h3 {
+    font-size: 1.7rem;
+  }
+  .buildfest-marquee-container {
+    height: 180px;
+    padding: 0 10px;
+  }
+  .buildfest-marquee img {
+    width: 220px;
+    height: 140px;
+    gap: 10px;
+  }
+  .buildfest-marquee {
+    gap: 10px;
+  }
+}
+

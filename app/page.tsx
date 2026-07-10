@@ -428,7 +428,32 @@ export default function Home() {
                     </div>
                   </article>
                 );
-                return card;
+                return (
+                  <div key={project.id} className="contents">
+                    {project.id === "desidigest" && (
+                      <div className="buildfest-showcase" data-reveal>
+                        <div className="buildfest-content">
+                          <span className="eyebrow">Hackathon Highlight</span>
+                          <h3>Infinity AI BuildFest 2026</h3>
+                          <p>
+                            Built in a high-intensity sprint among 3,626 participants, Desi Digest was created to solve local nutrition tracking challenges, ultimately securing a spot as a Top 100 finalist.
+                          </p>
+                        </div>
+                        <div className="buildfest-marquee-container">
+                          <div className="buildfest-marquee">
+                            <img src="/images/buildfest-1.webp" alt="Infinity AI BuildFest scene 1" />
+                            <img src="/images/buildfest-2.webp" alt="Infinity AI BuildFest scene 2" />
+                            <img src="/images/buildfest-3.webp" alt="Infinity AI BuildFest scene 3" />
+                            <img src="/images/buildfest-1.webp" alt="Infinity AI BuildFest scene 1" />
+                            <img src="/images/buildfest-2.webp" alt="Infinity AI BuildFest scene 2" />
+                            <img src="/images/buildfest-3.webp" alt="Infinity AI BuildFest scene 3" />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    {card}
+                  </div>
+                );
               })}
             </div>
           </div>
