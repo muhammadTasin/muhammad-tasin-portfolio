@@ -26,12 +26,7 @@ const LINKS = {
   salesBondhu: "https://github.com/muhammadTasin/SalesBondhu-AI",
 };
 
-const NAV_ITEMS = [
-  { label: "Work", href: "#work" },
-  { label: "Expertise", href: "#expertise" },
-  { label: "About", href: "#about" },
-  { label: "Contact", href: "#contact" }
-];
+// NAV_ITEMS is dynamically defined inside the component to support local event handlers.
 
 const BUBBLE_ITEMS = [
   { label: "Work", href: "#work", rotation: -5, hoverStyles: { bgColor: '#c8ff43', ...{ textColor: '#09090b' } } },
@@ -189,11 +184,20 @@ export default function Home() {
   const [theme, setTheme] = useState<"dark" | "light">("dark");
   const [menuOpen, setMenuOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [isCvModalOpen, setIsCvModalOpen] = useState(false);
   const [formMessage, setFormMessage] = useState("");
   const [localTime, setLocalTime] = useState("");
   const [activeSection, setActiveSection] = useState("top");
   const [emailCopied, setEmailCopied] = useState(false);
   const [keywordIndex, setKeywordIndex] = useState(0);
+
+  const navItems = useMemo(() => [
+    { label: "Work", href: "#work" },
+    { label: "Expertise", href: "#expertise" },
+    { label: "About", href: "#about" },
+    { label: "Contact", href: "#contact" },
+    { label: "CV", href: "#cv", onClick: () => setIsCvModalOpen(true) }
+  ], []);
 
   const searchItems: SearchItem[] = useMemo(() => {
     const items: SearchItem[] = [];
@@ -315,7 +319,7 @@ export default function Home() {
         <PillNav
           className=""
           logo={<span className="brand-mark font-bold text-xl px-2">MT</span>}
-          items={NAV_ITEMS}
+          items={navItems}
           activeHref={`#${activeSection}`}
           baseColor={theme === "dark" ? "rgba(255,255,255,0.09)" : "rgba(0,0,0,0.08)"}
           pillColor={theme === "dark" ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.05)"}
@@ -613,6 +617,40 @@ export default function Home() {
       </footer>
 
       {selectedProject && <div className="modal-backdrop" role="presentation" onMouseDown={() => setSelectedProject(null)}><section className="case-modal" role="dialog" aria-modal="true" aria-labelledby="case-title" onMouseDown={(event) => event.stopPropagation()}><button className="modal-close" type="button" onClick={() => setSelectedProject(null)} aria-label="Close case study" autoFocus>×</button><div className="modal-heading"><span className="eyebrow">{selectedProject.type} case study</span><h2 id="case-title">{selectedProject.name}</h2><p>{selectedProject.tagline}</p></div><div className="case-grid"><CaseFact label="Context" text={selectedProject.summary} /><CaseFact label="The problem" text={selectedProject.problem} /><CaseFact label="My role" text={selectedProject.role} /><CaseFact label="My contribution" text={selectedProject.contribution} /></div><div className="case-section"><span className="case-label">Architecture</span><div className="architecture-flow">{selectedProject.architecture.map((item, index) => <div key={item}><span>{String(index + 1).padStart(2, "0")}</span><strong>{item}</strong>{index < selectedProject.architecture.length - 1 && <i aria-hidden="true">→</i>}</div>)}</div></div><div className="case-grid detail-grid"><CaseFact label="Core solution" text={selectedProject.solution} /><CaseFact label="Security & reliability" text={selectedProject.reliability} /><CaseFact label="Challenge" text={selectedProject.challenges} /><CaseFact label="Trade-off" text={selectedProject.tradeoffs} /><CaseFact label="Testing & validation" text={selectedProject.testing} /><CaseFact label="Result" text={selectedProject.result} /></div><div className="case-section"><span className="case-label">Technologies</span><div className="tag-row modal-tags">{selectedProject.stack.map((tech) => <span key={tech}>{tech}</span>)}</div></div><div className="modal-actions">{selectedProject.live && <a className="button button-primary" href={selectedProject.live} target="_blank" rel="noopener noreferrer">View live <ArrowIcon /></a>}{selectedProject.github && <a className="button button-ghost" href={selectedProject.github} target="_blank" rel="noopener noreferrer">View repository <ArrowIcon /></a>}{!selectedProject.github && <span className="private-note">Private project · no repository link exposed</span>}</div></section></div>}
+
+      {isCvModalOpen && (
+        <div className="modal-backdrop" role="presentation" onMouseDown={() => setIsCvModalOpen(false)}>
+          <section className="case-modal" style={{ maxWidth: "480px" }} role="dialog" aria-modal="true" aria-labelledby="cv-modal-title" onMouseDown={(event) => event.stopPropagation()}>
+            <button className="modal-close" type="button" onClick={() => setIsCvModalOpen(false)} aria-label="Close CV download" autoFocus>×</button>
+            <div className="modal-heading">
+              <span className="eyebrow">Curriculum Vitae</span>
+              <h2 id="cv-modal-title">Download Resume</h2>
+              <p>Get a copy of Muhammad Tasin&apos;s ATS-friendly professional resume in your preferred format.</p>
+            </div>
+            
+            <div style={{ display: "grid", gap: "16px", margin: "24px 0" }}>
+              <a 
+                className="button button-primary cursor-target" 
+                href={LINKS.resumePdf} 
+                download 
+                style={{ justifyContent: "center", width: "100%" }}
+                onClick={() => setIsCvModalOpen(false)}
+              >
+                Download ATS CV (PDF) <span aria-hidden="true" style={{ marginLeft: "6px" }}>↓</span>
+              </a>
+              <a 
+                className="button button-ghost cursor-target" 
+                href={LINKS.resumeDocx} 
+                download 
+                style={{ justifyContent: "center", width: "100%" }}
+                onClick={() => setIsCvModalOpen(false)}
+              >
+                Download ATS CV (Word) <span aria-hidden="true" style={{ marginLeft: "6px" }}>↓</span>
+              </a>
+            </div>
+          </section>
+        </div>
+      )}
 
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ "@context": "https://schema.org", "@type": "Person", name: "Muhammad Tasin", jobTitle: "AI-Focused Backend Developer | Full-Stack & Flutter App Developer", email: `mailto:${LINKS.email}`, sameAs: [LINKS.github, LINKS.linkedin], alumniOf: { "@type": "CollegeOrUniversity", name: "BRAC University" }, knowsAbout: ["FastAPI", "Flutter", "LLM integration", "RAG", "React", "Supabase"], subjectOf: projects.map((project) => ({ "@type": "CreativeWork", name: project.name, description: project.summary, ...(project.github ? { url: project.github } : {}) })) }) }} />
     </>
