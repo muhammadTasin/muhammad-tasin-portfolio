@@ -1,0 +1,203 @@
+/* ───────────────────────────────────────────────
+   BubbleMenu — MOBILE-ONLY trigger + overlay
+   Desktop (≥900px): hidden completely
+   ─────────────────────────────────────────────── */
+
+/* ── Container (trigger row) ── */
+.bubble-menu {
+  display: none; /* hidden by default, shown only on mobile */
+  align-items: center;
+  gap: 10px;
+  pointer-events: none;
+  z-index: 99;
+}
+
+/* Show only below 900px */
+@media (max-width: 899px) {
+  .bubble-menu {
+    display: flex;
+  }
+}
+
+.bubble-menu.fixed {
+  position: fixed;
+}
+
+.bubble-menu.absolute {
+  position: relative; /* stay in flow when inside header */
+}
+
+/* ── Individual bubbles (logo + toggle) ── */
+.bubble-menu .bubble {
+  --bubble-size: 42px;
+  width: var(--bubble-size);
+  height: var(--bubble-size);
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+}
+
+.bubble-menu .logo-bubble {
+  /* Hide the logo bubble — brand already in header */
+  display: none;
+}
+
+.bubble-menu .toggle-bubble {
+  width: var(--bubble-size);
+  height: var(--bubble-size);
+  flex-shrink: 0;
+}
+
+.bubble-menu .bubble-logo {
+  max-height: 60%;
+  max-width: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* ── Hamburger lines ── */
+.bubble-menu .menu-btn {
+  border: none;
+  background: #fff;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  pointer-events: auto;
+}
+
+.bubble-menu .menu-line {
+  width: 18px;
+  height: 2px;
+  background: #111;
+  border-radius: 2px;
+  display: block;
+  margin: 0 auto;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  transform-origin: center;
+}
+
+.bubble-menu .menu-line + .menu-line {
+  margin-top: 5px;
+}
+
+.bubble-menu .menu-btn.open .menu-line:first-child {
+  transform: translateY(3.5px) rotate(45deg);
+}
+
+.bubble-menu .menu-btn.open .menu-line:last-child {
+  transform: translateY(-3.5px) rotate(-45deg);
+}
+
+/* ═══════════════════════════════════════════════
+   Menu items overlay
+   Only shown when isOpen — GSAP controls visibility
+   ═══════════════════════════════════════════════ */
+.bubble-menu-items {
+  /* Fullscreen overlay on mobile */
+  position: fixed;
+  inset: 0;
+  display: none; /* GSAP sets display:flex */
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 200;
+  background: rgba(9, 9, 11, 0.88);
+  backdrop-filter: blur(18px) saturate(120%);
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 20px);
+}
+
+/* Ensure fixed always */
+.bubble-menu-items.fixed,
+.bubble-menu-items.absolute {
+  position: fixed;
+}
+
+/* ── Nav items list ── */
+.bubble-menu-items .pill-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  max-width: 380px;
+  pointer-events: auto;
+}
+
+.bubble-menu-items .pill-list .pill-col {
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  width: 100%;
+}
+
+/* ── Individual nav links (the "bubbles") ── */
+.bubble-menu-items .pill-link {
+  --pill-bg: rgba(255, 255, 255, 0.06);
+  --pill-color: #f3f1eb;
+  --hover-bg: #c8ff43;
+  --hover-color: #09090b;
+  --item-rot: 0deg;
+
+  width: 100%;
+  max-width: 210px;
+  min-height: 72px;
+  padding: 0 24px;
+  font-size: clamp(1rem, 4.5vw, 1.25rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  border-radius: 999px;
+  background: var(--pill-bg);
+  color: var(--pill-color);
+  text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: background 0.25s ease, color 0.25s ease, transform 0.18s ease;
+  will-change: transform;
+  box-sizing: border-box;
+  white-space: nowrap;
+  overflow: hidden;
+  /* Subtle rotation from --item-rot but capped */
+  transform: rotate(calc(var(--item-rot) * 0.4));
+}
+
+.bubble-menu-items .pill-link:hover,
+.bubble-menu-items .pill-link:focus-visible {
+  background: var(--hover-bg);
+  color: var(--hover-color);
+  transform: rotate(calc(var(--item-rot) * 0.4)) scale(1.04);
+}
+
+.bubble-menu-items .pill-link:active {
+  transform: rotate(calc(var(--item-rot) * 0.4)) scale(0.96);
+}
+
+.bubble-menu-items .pill-link .pill-label {
+  display: inline-block;
+  will-change: transform, opacity;
+  height: 1.2em;
+  line-height: 1.2;
+}
+
+/* ── Close button backdrop area ── */
+.bubble-menu-items::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  cursor: default;
+}

@@ -1,7 +1,15 @@
 "use client";
 
 /* eslint-disable @next/next/no-img-element */
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useState, useMemo } from "react";
+import PillNav from "@/components/ui/pill-nav";
+import BubbleMenu from "@/components/ui/bubble-menu";
+import { PortfolioSearch, SearchItem } from "@/components/ui/portfolio-search";
+import LogoLoop from "@/components/effects/logo-loop";
+import { TypewriterEffect } from "@/components/ui/typewriter-effect";
+import ElectricBorder from "@/components/effects/electric-border";
+import GradualBlur from "@/components/ui/gradual-blur";
+import Strands from "@/components/ui/strands";
 
 const LINKS = {
   github: "https://github.com/muhammadTasin",
@@ -13,6 +21,20 @@ const LINKS = {
   courseVault: "https://github.com/muhammadTasin/Bracu-coursevault-ai",
   latexStudio: "https://github.com/muhammadTasin/Latex-Converter",
 };
+
+const NAV_ITEMS = [
+  { label: "Work", href: "#work" },
+  { label: "Expertise", href: "#expertise" },
+  { label: "About", href: "#about" },
+  { label: "Contact", href: "#contact" }
+];
+
+const BUBBLE_ITEMS = [
+  { label: "Work", href: "#work", rotation: -5, hoverStyles: { bgColor: '#c8ff43', ...{ textColor: '#09090b' } } },
+  { label: "Expertise", href: "#expertise", rotation: 5, hoverStyles: { bgColor: '#f1814d', ...{ textColor: '#ffffff' } } },
+  { label: "About", href: "#about", rotation: 5, hoverStyles: { bgColor: '#78a9ff', ...{ textColor: '#ffffff' } } },
+  { label: "Contact", href: "#contact", rotation: -5, hoverStyles: { bgColor: '#c8ff43', ...{ textColor: '#09090b' } } }
+];
 
 type Project = {
   id: "salesbondhu" | "desidigest" | "coursevault" | "latex";
@@ -143,8 +165,6 @@ const repositories = [
   { name: "Qasas", language: "TypeScript", description: "Full-stack story publishing with authentication, reactions, comments and read-time analytics.", url: "https://github.com/muhammadTasin/Qasas-" },
   { name: "Aircraft Maintenance Tracker v2", language: "JavaScript", description: "Role-aware fleet maintenance, defect, task and operational-alert workflows.", url: "https://github.com/muhammadTasin/aircraft-maintenance-tracker-v2-publish-ready" },
   { name: "Falah", language: "TypeScript", description: "Private per-user ibadah tracking with prayer times, Firebase and optional AI reflections.", url: "https://github.com/muhammadTasin/falah-web" },
-  { name: "Java DSA Practice", language: "Java", description: "Hands-on data structures, tree traversal and algorithm fundamentals.", url: "https://github.com/muhammadTasin/dsa-practice-and-learning-basic" },
-  { name: "CSE 427 Machine Learning", language: "Jupyter Notebook", description: "University machine-learning labs and reproducible coursework experiments.", url: "https://github.com/muhammadTasin/Cse-427-Machine-learning-" },
 ];
 
 const expertise = [
@@ -162,10 +182,44 @@ export default function Home() {
   const [theme, setTheme] = useState<"dark" | "light">("dark");
   const [menuOpen, setMenuOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-  const [localTime, setLocalTime] = useState("");
   const [formMessage, setFormMessage] = useState("");
+  const [localTime, setLocalTime] = useState("");
+  const [activeSection, setActiveSection] = useState("top");
   const [emailCopied, setEmailCopied] = useState(false);
   const [keywordIndex, setKeywordIndex] = useState(0);
+
+  const searchItems: SearchItem[] = useMemo(() => {
+    const items: SearchItem[] = [];
+    projects.forEach(p => {
+      items.push({ id: `project-${p.id}`, title: p.name, subtitle: p.tagline, type: "Project", href: `#project-${p.id}`, matches: p.stack });
+    });
+    expertise.forEach(e => {
+      items.push({ id: `exp-${e.index}`, title: e.title, subtitle: e.description, type: "Expertise", href: "#expertise", matches: e.skills });
+    });
+    repositories.forEach(r => {
+      items.push({ id: `repo-${r.name}`, title: r.name, subtitle: r.description, type: "Repository", href: r.url });
+    });
+    items.push({ id: "nav-about", title: "About", type: "Section", href: "#about" });
+    items.push({ id: "nav-contact", title: "Contact", type: "Section", href: "#contact" });
+    items.push({ id: "nav-github", title: "GitHub", subtitle: "View my GitHub profile", type: "Link", href: LINKS.github });
+    items.push({ id: "nav-resume", title: "Resume", subtitle: "Download my resume", type: "Link", href: LINKS.resume });
+    return items;
+  }, []);
+
+  const handleSearchSelect = (item: SearchItem) => {
+    if (item.id.startsWith("project-")) {
+      const p = projects.find(proj => `project-${proj.id}` === item.id);
+      if (p) {
+        setSelectedProject(p);
+      }
+    } else if (item.href) {
+      if (item.href.startsWith("http")) {
+        window.open(item.href, "_blank");
+      } else {
+        window.location.hash = item.href;
+      }
+    }
+  };
 
   useEffect(() => {
     document.documentElement.classList.add("motion-ready");
@@ -176,12 +230,35 @@ export default function Home() {
     const keyword = reduceMotion ? 0 : window.setInterval(() => setKeywordIndex((value) => (value + 1) % keywords.length), 2200);
     const items = Array.from(document.querySelectorAll<HTMLElement>("[data-reveal]"));
     if (reduceMotion || !("IntersectionObserver" in window)) items.forEach((item) => item.classList.add("is-visible"));
-    const observer = reduceMotion ? null : new IntersectionObserver((entries) => entries.forEach((entry) => { if (entry.isIntersecting) { entry.target.classList.add("is-visible"); observer?.unobserve(entry.target); } }), { threshold: 0.12 });
+    const observer = reduceMotion ? null : new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+        } else if (entry.intersectionRatio === 0) {
+          entry.target.classList.remove("is-visible");
+        }
+      });
+    }, { threshold: [0, 0.12] });
     items.forEach((item) => observer?.observe(item));
-    const glow = document.querySelector<HTMLElement>(".cursor-glow");
-    const moveGlow = (event: PointerEvent) => { if (glow && !reduceMotion) glow.style.transform = `translate3d(${event.clientX}px, ${event.clientY}px, 0)`; };
-    window.addEventListener("pointermove", moveGlow, { passive: true });
-    return () => { window.clearInterval(clock); if (keyword) window.clearInterval(keyword); observer?.disconnect(); window.removeEventListener("pointermove", moveGlow); };
+
+    const sectionObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
+          }
+        });
+      },
+      { threshold: 0.3 }
+    );
+    const sections = document.querySelectorAll("section[id]");
+    sections.forEach((s) => sectionObserver.observe(s));
+    
+    // Close mobile menu when resizing to desktop
+    const handleResize = () => { if (window.innerWidth >= 900) setMenuOpen(false); };
+    window.addEventListener("resize", handleResize, { passive: true });
+
+    return () => { window.clearInterval(clock); if (keyword) window.clearInterval(keyword); observer?.disconnect(); sectionObserver.disconnect(); window.removeEventListener("resize", handleResize); };
   }, []);
 
   useEffect(() => {
@@ -220,32 +297,40 @@ export default function Home() {
 
   return (
     <>
+      <GradualBlur position="top" height="100px" strength={10} divCount={4} />
       <a className="skip-link" href="#main">Skip to content</a>
-      <div className="cursor-glow" aria-hidden="true" />
       <header className="site-header">
-        <a className="brand" href="#top" aria-label="Muhammad Tasin home">
+        <a className="brand cursor-target" href="#top" aria-label="Muhammad Tasin home">
           <span className="brand-mark">MT</span>
           <span className="brand-copy"><strong>Muhammad Tasin</strong><small>AI · Backend · Flutter</small></span>
         </a>
-        <nav className={menuOpen ? "nav-links open" : "nav-links"} aria-label="Primary navigation">
-          <a href="#work" onClick={() => setMenuOpen(false)}>Work</a>
-          <a href="#expertise" onClick={() => setMenuOpen(false)}>Expertise</a>
-          <a href="#github" onClick={() => setMenuOpen(false)}>GitHub</a>
-          <a href="#about" onClick={() => setMenuOpen(false)}>About</a>
-          <a href="#contact" onClick={() => setMenuOpen(false)}>Contact</a>
-          <div className="nav-socials">
-            <a href={LINKS.github} target="_blank" rel="noopener noreferrer" aria-label="View Muhammad Tasin on GitHub in a new tab">GitHub <ArrowIcon /></a>
-            <a href={LINKS.linkedin} target="_blank" rel="noopener noreferrer" aria-label="Connect with Muhammad Tasin on LinkedIn in a new tab">LinkedIn <ArrowIcon /></a>
-          </div>
-        </nav>
+        <PillNav
+          className=""
+          logo={<span className="brand-mark font-bold text-xl px-2">MT</span>}
+          items={NAV_ITEMS}
+          activeHref={`#${activeSection}`}
+          baseColor={theme === "dark" ? "rgba(255,255,255,0.09)" : "rgba(0,0,0,0.08)"}
+          pillColor={theme === "dark" ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.05)"}
+          pillTextColor={theme === "dark" ? "#f3f1eb" : "#121214"}
+          hoveredPillTextColor={theme === "dark" ? "#c8ff43" : "#0b6e0b"}
+        />
         <div className="header-actions">
           <div className="header-socials">
-            <a href={LINKS.github} target="_blank" rel="noopener noreferrer" aria-label="View GitHub profile in a new tab">GH</a>
-            <a href={LINKS.linkedin} target="_blank" rel="noopener noreferrer" aria-label="View LinkedIn profile in a new tab">in</a>
+            <a href={LINKS.github} className="cursor-target" target="_blank" rel="noopener noreferrer" aria-label="View GitHub profile in a new tab">GH</a>
+            <a href={LINKS.linkedin} className="cursor-target" target="_blank" rel="noopener noreferrer" aria-label="View LinkedIn profile in a new tab">in</a>
           </div>
-          <button className="theme-toggle" type="button" onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}><span>{theme === "dark" ? "☼" : "☾"}</span></button>
-          <a className="button button-small" href="#contact">Let&apos;s talk <ArrowIcon /></a>
-          <button className="menu-toggle" type="button" onClick={() => setMenuOpen(!menuOpen)} aria-expanded={menuOpen} aria-label="Toggle navigation"><span></span><span></span></button>
+          <div className="desktop-search-wrap">
+            <PortfolioSearch items={searchItems} onSelect={handleSearchSelect} />
+          </div>
+          <button className="theme-toggle cursor-target" type="button" onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}><span>{theme === "dark" ? "☼" : "☾"}</span></button>
+          <a className="button button-small cursor-target desktop-cta" href="#contact">Let&apos;s talk <ArrowIcon /></a>
+          <BubbleMenu
+            items={BUBBLE_ITEMS}
+            logo={<span className="brand-mark font-bold text-xl px-2">MT</span>}
+            menuBg="#1a1a1e"
+            menuContentColor="#f3f1eb"
+            onMenuClick={setMenuOpen}
+          />
         </div>
       </header>
 
@@ -291,40 +376,54 @@ export default function Home() {
         <section className="section work-section" id="work">
           <div className="container">
             <div className="section-heading" data-reveal><div><span className="eyebrow">Verified selected work · 2026</span><h2>Real products.<br /><em>Real constraints.</em></h2></div><p>Four focused case studies—one private production project and three verified public repositories. Each card shows the problem, contribution and engineering decision.</p></div>
-            <div className="project-list">
-              {projects.map((project) => (
-                <article className={`project-card ${project.accent}`} key={project.id} data-reveal>
-                  <div className="project-copy">
-                    <div className="project-meta"><span>{project.number}</span><span>{project.type}</span></div>
-                    <div className="visibility-label"><i></i>{project.visibility}</div>
-                    <h3>{project.name}</h3>
-                    <p className="project-tagline">{project.tagline}</p>
-                    <p className="project-summary">{project.summary}</p>
-                    <div className="project-facts">
-                      <div><span>Problem</span><p>{project.problem}</p></div>
-                      <div><span>My contribution</span><p>{project.contribution}</p></div>
-                      <div><span>Engineering decision</span><p>{project.decision}</p></div>
+            <div className="project-grid">
+              {projects.map((project, index) => {
+                const card = (
+                  <article className={`project-card cursor-target ${project.accent}`} key={project.id} id={`project-${project.id}`} data-reveal>
+                    {index < 4 && (
+                      <div className="absolute inset-0 pointer-events-none z-0 opacity-40 mix-blend-screen" aria-hidden="true">
+                        <Strands 
+                          colors={['#c8ff43', '#78a9ff', '#aa8cff']} 
+                          speed={0.8}
+                          amplitude={1.2}
+                          thickness={0.8}
+                          opacity={0.6}
+                        />
+                      </div>
+                    )}
+                    <div className="project-copy relative z-10">
+                      <div className="project-meta"><span>{project.number}</span><span>{project.type}</span></div>
+                      <div className="visibility-label"><i></i>{project.visibility}</div>
+                      <h3>{project.name}</h3>
+                      <p className="project-tagline">{project.tagline}</p>
+                      <p className="project-summary">{project.summary}</p>
+                      <div className="project-facts">
+                        <div><span>Problem</span><p>{project.problem}</p></div>
+                        <div><span>My contribution</span><p>{project.contribution}</p></div>
+                        <div><span>Engineering decision</span><p>{project.decision}</p></div>
+                      </div>
+                      <div className="tag-row">{project.stack.slice(0, 6).map((tech) => <span key={tech}>{tech}</span>)}</div>
+                      <div className="project-actions">
+                        {project.live && <a className="button button-primary cursor-target" href={project.live} target="_blank" rel="noopener noreferrer" aria-label={`Open ${project.name} live product in a new tab`}>Live product <ArrowIcon /></a>}
+                        {project.github && <a className="button button-ghost cursor-target" href={project.github} target="_blank" rel="noopener noreferrer" aria-label={`Open ${project.name} repository on GitHub in a new tab`}>GitHub <ArrowIcon /></a>}
+                        {!project.github && <button className="button button-ghost cursor-target" type="button" onClick={() => setSelectedProject(project)}>Architecture overview <span aria-hidden="true">→</span></button>}
+                        <button className="case-button cursor-target" type="button" onClick={() => setSelectedProject(project)}>Case study <span aria-hidden="true">→</span></button>
+                      </div>
                     </div>
-                    <div className="tag-row">{project.stack.slice(0, 6).map((tech) => <span key={tech}>{tech}</span>)}</div>
-                    <div className="project-actions">
-                      {project.live && <a className="button button-primary" href={project.live} target="_blank" rel="noopener noreferrer" aria-label={`Open ${project.name} live product in a new tab`}>Live product <ArrowIcon /></a>}
-                      {project.github && <a className="button button-ghost" href={project.github} target="_blank" rel="noopener noreferrer" aria-label={`Open ${project.name} repository on GitHub in a new tab`}>GitHub <ArrowIcon /></a>}
-                      {!project.github && <button className="button button-ghost" type="button" onClick={() => setSelectedProject(project)}>Architecture overview <span aria-hidden="true">→</span></button>}
-                      <button className="case-button" type="button" onClick={() => setSelectedProject(project)}>Case study <span aria-hidden="true">→</span></button>
+                    <div className="project-visual" aria-label={`${project.name} product presentation`}>
+                      <div className="visual-frame">
+                        <div className="visual-bar"><span></span><span></span><span></span><small>{project.id}.system</small></div>
+                        {project.id === "salesbondhu" && <SalesVisual />}
+                        {project.id === "desidigest" && <DigestVisual />}
+                        {project.id === "coursevault" && <CourseVaultVisual />}
+                        {project.id === "latex" && <LatexVisual />}
+                      </div>
+                      <div className="proof-chip"><span>✓</span>{project.result}</div>
                     </div>
-                  </div>
-                  <div className="project-visual" aria-label={`${project.name} product presentation`}>
-                    <div className="visual-frame">
-                      <div className="visual-bar"><span></span><span></span><span></span><small>{project.id}.system</small></div>
-                      {project.id === "salesbondhu" && <SalesVisual />}
-                      {project.id === "desidigest" && <DigestVisual />}
-                      {project.id === "coursevault" && <CourseVaultVisual />}
-                      {project.id === "latex" && <LatexVisual />}
-                    </div>
-                    <div className="proof-chip"><span>✓</span>{project.result}</div>
-                  </div>
-                </article>
-              ))}
+                  </article>
+                );
+                return card;
+              })}
             </div>
           </div>
         </section>
@@ -344,7 +443,48 @@ export default function Home() {
         <section className="section expertise-section" id="expertise">
           <div className="container">
             <div className="section-heading compact" data-reveal><div><span className="eyebrow">Technical expertise</span><h2>Built across the<br /><em>product stack.</em></h2></div><p>No arbitrary percentages—just the tools I use to turn product requirements into working systems.</p></div>
-            <div className="expertise-grid">{expertise.map((item) => <article className="expertise-card" key={item.index} data-reveal><span className="expertise-index">{item.index}</span><h3>{item.title}</h3><p>{item.description}</p><div className="skill-list">{item.skills.map((skill) => <span key={skill}>{skill}</span>)}</div></article>)}</div>
+            <div className="expertise-grid">
+              {expertise.map((exp) => (
+                <article className="expertise-card" key={exp.index} data-reveal>
+                  <div className="expertise-meta"><span>{exp.index}</span></div>
+                  <h3>{exp.title}</h3>
+                  <p>{exp.description}</p>
+                  <div className="tag-row">
+                    {exp.skills.map((skill) => <span key={skill}>{skill}</span>)}
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="section logo-loop-section">
+          <div className="container">
+            <p className="logo-loop-heading">Tools behind the work</p>
+            <LogoLoop 
+              logos={[
+                { src: "/logos/python.svg", title: "Python" },
+                { src: "/logos/java.svg", title: "Java" },
+                { src: "/logos/javascript.svg", title: "JavaScript" },
+                { src: "/logos/typescript.svg", title: "TypeScript" },
+                { src: "/logos/dart.svg", title: "Dart" },
+                { src: "/logos/fastapi.svg", title: "FastAPI" },
+                { src: "/logos/postgresql.svg", title: "PostgreSQL" },
+                { src: "/logos/supabase.svg", title: "Supabase" },
+                { src: "/logos/react.svg", title: "React" },
+                { src: "/logos/nextjs.svg", title: "Next.js" },
+                { src: "/logos/flutter.svg", title: "Flutter" },
+                { src: "/logos/git.svg", title: "Git" },
+                { src: "/logos/github.svg", title: "GitHub" },
+                { src: "/logos/docker.svg", title: "Docker" },
+                { src: "/logos/android-studio.svg", title: "Android Studio" },
+                { src: "/logos/postman.svg", title: "Postman" },
+                { src: "/logos/intellij.svg", title: "IntelliJ IDEA" },
+                { src: "/logos/pycharm.svg", title: "PyCharm" },
+              ]}
+              speed={40}
+              direction="left"
+            />
           </div>
         </section>
 
@@ -372,30 +512,66 @@ export default function Home() {
         </section>
 
         <section className="section contact-section" id="contact">
-          <div className="container contact-grid">
-            <div className="contact-copy" data-reveal>
-              <span className="eyebrow">Start a conversation</span><h2>Have a useful problem<br />to <em>build around?</em></h2><p>I&apos;m open to internships, junior developer roles and thoughtful collaborations across AI, backend, Flutter and full-stack products.</p>
-              <div className="contact-facts"><div><span>Based in</span><strong>Dhaka, Bangladesh</strong></div><div><span>Local time</span><strong>{localTime ? `${localTime} BST` : "Bangladesh time"}</strong></div><div><span>Email</span><strong>{LINKS.email}</strong></div></div>
-              <div className="contact-cards">
-                <a href={LINKS.github} target="_blank" rel="noopener noreferrer" aria-label="View GitHub profile in a new tab"><span>GH</span><div><small>Code & repositories</small><strong>View GitHub</strong></div><ArrowIcon /></a>
-                <a href={LINKS.linkedin} target="_blank" rel="noopener noreferrer" aria-label="Connect on LinkedIn in a new tab"><span>in</span><div><small>Professional profile</small><strong>Connect on LinkedIn</strong></div><ArrowIcon /></a>
-                <button type="button" onClick={copyEmail}><span>@</span><div><small>Direct email</small><strong>{emailCopied ? "Email copied" : "Copy email"}</strong></div><span aria-hidden="true">{emailCopied ? "✓" : "⧉"}</span></button>
+          <div className="container" data-reveal>
+            <div className="contact-grid">
+              <div className="contact-copy">
+                <h2 className="sr-only">Have a useful problem to build around?</h2>
+                <h2 aria-hidden="true" className="text-[clamp(2.7rem,5.2vw,5rem)] leading-[0.96] tracking-[-0.067em] font-bold mt-[17px]">
+                  Have a{" "}
+                  <TypewriterEffect
+                    words={[
+                      { text: "useful", className: "text-acid font-normal font-serif text-[clamp(2.7rem,5.2vw,5rem)]" },
+                      { text: "problem", className: "text-acid font-normal font-serif text-[clamp(2.7rem,5.2vw,5rem)]" }
+                    ]}
+                    inline={true}
+                    loopInterval={15000}
+                  />
+                  <br />
+                  to <em className="text-acid font-normal font-serif">build around?</em>
+                </h2>
+              </div>
+              <div className="contact-form-container">
+                <form className="contact-form" onSubmit={handleSubmit} noValidate>
+                  <label><span>Your name</span><input name="name" type="text" placeholder="Jane Smith" required minLength={2} autoComplete="name" /></label>
+                  <label><span>Email address</span><input name="email" type="email" placeholder="jane@company.com" required autoComplete="email" /></label>
+                  <label><span>What are you building?</span><textarea name="message" rows={5} placeholder="Tell me about the role, product or problem..." required minLength={12}></textarea></label>
+                  <label className="honeypot" aria-hidden="true"><span>Website</span><input name="website" type="text" tabIndex={-1} autoComplete="off" /></label>
+                  <button className="button button-primary cursor-target" type="submit">Prepare email <ArrowIcon /></button>
+                </form>
+                {formMessage && <p className="form-message" role="status" aria-live="polite">{formMessage}</p>}
+                <div className="direct-contact mt-8 pt-8 border-t border-line">
+                  <p className="text-muted text-sm mb-2">Or email me directly:</p>
+                  <button className="text-link cursor-target group relative" onClick={copyEmail} aria-label="Copy email address to clipboard">
+                    <span className="font-mono">{LINKS.email}</span>
+                    <span className={`copy-feedback ${emailCopied ? "visible" : ""}`} aria-hidden="true">{emailCopied ? "Copied!" : "Copy"}</span>
+                  </button>
+                </div>
               </div>
             </div>
-            <form className="contact-form" onSubmit={handleSubmit} noValidate data-reveal>
-              <label><span>Your name</span><input name="name" type="text" placeholder="Jane Smith" required minLength={2} autoComplete="name" /></label>
-              <label><span>Email address</span><input name="email" type="email" placeholder="jane@company.com" required autoComplete="email" /></label>
-              <label><span>What are you building?</span><textarea name="message" rows={5} placeholder="Tell me about the role, product or problem..." required minLength={12}></textarea></label>
-              <label className="honeypot" aria-hidden="true"><span>Website</span><input name="website" type="text" tabIndex={-1} autoComplete="off" /></label>
-              <button className="button button-primary form-submit" type="submit">Prepare email <ArrowIcon /></button>
-              <p className="form-note" role="status">{formMessage || "No data is stored. Your email app handles the message."}</p>
-            </form>
           </div>
         </section>
       </main>
 
-      <footer className="footer">
-        <div className="container footer-main"><div><strong>Muhammad Tasin</strong><p>AI-Focused Backend Developer · Full-Stack & Flutter App Developer</p></div><div className="footer-links"><a href={LINKS.github} target="_blank" rel="noopener noreferrer">GitHub <ArrowIcon /></a><a href={LINKS.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn <ArrowIcon /></a><a href={`mailto:${LINKS.email}`}>Email</a><a href={LINKS.resume} download>Resume ↓</a></div></div>
+      <footer className="site-footer">
+        <div className="container footer-grid">
+          <div className="footer-col">
+            <a className="brand cursor-target" href="#top" aria-label="Back to top">
+              <span className="brand-mark">MT</span>
+            </a>
+          </div>
+          <div className="footer-col">
+            <strong>Navigation</strong>
+            <a href="#work" className="cursor-target">Work</a>
+            <a href="#expertise" className="cursor-target">Expertise</a>
+            <a href="#about" className="cursor-target">About</a>
+            <a href="#contact" className="cursor-target">Contact</a>
+          </div>
+          <div className="footer-col">
+            <strong>Social</strong>
+            <a href={LINKS.github} target="_blank" rel="noopener noreferrer" className="cursor-target">GitHub</a>
+            <a href={LINKS.linkedin} target="_blank" rel="noopener noreferrer" className="cursor-target">LinkedIn</a>
+          </div>
+        </div>
         <div className="container footer-bottom"><span>© 2026 Muhammad Tasin</span><span>Built with proof, curiosity and care.</span></div>
       </footer>
 
