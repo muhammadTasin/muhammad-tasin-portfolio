@@ -1,0 +1,151 @@
+/* ───────────────────────────────────────────────
+   PillNav — desktop-only centred nav strip
+   Mobile: hidden completely (BubbleMenu takes over)
+   ─────────────────────────────────────────────── */
+
+.pill-nav-container {
+  /* No absolute positioning — sits naturally in the header grid */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+/* Hide on mobile — BubbleMenu replaces it */
+@media (max-width: 899px) {
+  .pill-nav-container {
+    display: none !important;
+  }
+}
+
+.pill-nav {
+  --nav-h: 40px;
+  --pill-pad-x: 16px;
+  --pill-gap: 3px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: max-content;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* The logo circle is decorative — hide it since the brand is in the header */
+.pill-logo {
+  display: none;
+}
+
+.pill-nav-items {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: var(--nav-h);
+  background: var(--base, #fff);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+/* The pill-nav.tsx adds "desktop-only" class which we've overridden —
+   ensure items are always visible when container is visible */
+.pill-nav-items.desktop-only {
+  display: flex !important;
+}
+
+.pill-list {
+  list-style: none;
+  display: flex;
+  align-items: stretch;
+  gap: var(--pill-gap);
+  margin: 0;
+  padding: 3px;
+  height: 100%;
+}
+
+.pill-list > li {
+  display: flex;
+  height: 100%;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 0 var(--pill-pad-x);
+  background: var(--pill-bg, #fff);
+  color: var(--pill-text, var(--base, #000));
+  text-decoration: none;
+  border-radius: 9999px;
+  box-sizing: border-box;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: color 0.2s ease;
+}
+
+.pill .hover-circle {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  border-radius: 50%;
+  background: var(--base, #000);
+  z-index: 1;
+  display: block;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.pill .label-stack {
+  position: relative;
+  display: inline-block;
+  line-height: 1;
+  z-index: 2;
+}
+
+.pill .pill-label {
+  position: relative;
+  z-index: 2;
+  display: inline-block;
+  line-height: 1;
+  will-change: transform;
+}
+
+.pill .pill-label-hover {
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--hover-text, #fff);
+  z-index: 3;
+  display: inline-block;
+  will-change: transform, opacity;
+}
+
+.pill.is-active {
+  background: rgba(0,0,0,0.08);
+}
+
+/* Active indicator dot */
+.pill.is-active::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 10px;
+  height: 10px;
+  background: var(--base, #000);
+  border-radius: 50px;
+  z-index: 4;
+}
+
+/* Hide hamburger — pill-nav doesn't do mobile */
+.mobile-menu-button,
+.mobile-menu-popover {
+  display: none !important;
+}
