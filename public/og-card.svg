@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <radialGradient id="glow" cx="82%" cy="42%" r="58%"><stop offset="0" stop-color="#c8ff43" stop-opacity=".22"/><stop offset="1" stop-color="#09090b" stop-opacity="0"/></radialGradient>
+    <pattern id="grid" width="72" height="72" patternUnits="userSpaceOnUse"><path d="M72 0H0V72" fill="none" stroke="#fff" stroke-opacity=".07"/></pattern>
+  </defs>
+  <rect width="1200" height="630" fill="#09090b"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+  <rect x="56" y="52" width="74" height="74" rx="20" fill="#f4f2ec"/>
+  <text x="93" y="98" text-anchor="middle" font-family="Arial, sans-serif" font-size="21" font-weight="800" fill="#09090b">MT</text>
+  <text x="158" y="79" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#f4f2ec">Muhammad Tasin</text>
+  <text x="158" y="110" font-family="Arial, sans-serif" font-size="16" fill="#9a9994">AI · Backend · Flutter</text>
+  <text x="58" y="270" font-family="Arial, sans-serif" font-size="74" font-weight="700" letter-spacing="-4" fill="#f4f2ec">Building intelligent</text>
+  <text x="58" y="355" font-family="Arial, sans-serif" font-size="74" font-weight="700" letter-spacing="-4" fill="#f4f2ec">products that work.</text>
+  <text x="60" y="424" font-family="Arial, sans-serif" font-size="23" fill="#9a9994">Backend · Flutter · Full-stack · LLM integration · RAG</text>
+  <rect x="60" y="500" width="310" height="54" rx="16" fill="#c8ff43"/>
+  <text x="215" y="535" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" font-weight="700" fill="#09090b">Practical AI systems →</text>
+  <circle cx="1020" cy="484" r="126" fill="none" stroke="#c8ff43" stroke-opacity=".22"/>
+  <circle cx="1020" cy="484" r="78" fill="none" stroke="#c8ff43" stroke-opacity=".33"/>
+</svg>

@@ -1,0 +1,27 @@
+MUHAMMAD TASIN
+AI-Focused Backend Developer | Full-Stack & Flutter App Developer
+Dhaka, Bangladesh
+
+GitHub: https://github.com/muhammadTasin
+LinkedIn: https://www.linkedin.com/in/md-tasfiq-tasin-701634359/
+Email: muhammadtasin18@gmail.com
+
+SUMMARY
+CSE student at BRAC University building practical AI-powered web and mobile products with secure backend APIs, databases, Flutter and context-aware LLM workflows.
+
+CORE EXPERTISE
+Backend & AI: Python, FastAPI, REST APIs, JWT, LLM Integration, RAG, Supabase, PostgreSQL
+Frontend & Mobile: Flutter, React, Next.js, JavaScript, TypeScript
+Tools: Git, GitHub, Docker, Linux, Postman, Android Studio
+
+FEATURED PROJECTS
+SalesBondhu AI — Private production-oriented Flutter field-sales platform with GPS visit verification, manager monitoring and a Bangla AI sales coach.
+Desi Digest — Culturally intelligent nutrition platform using photo meal analysis, Gemini, Supabase and safety-aware AI workflows.
+CourseVault AI — Next.js and Supabase academic resource command center with RLS, route guards and Three.js visuals.
+Research LaTeX Studio — Research document recovery tool for structured LaTeX, equations, tables, citations, PDF extraction and OCR.
+
+ACHIEVEMENT
+Top 100 finalist — Infinity AI BuildFest 2026 (from 3,626 participants)
+
+EDUCATION
+B.Sc. in Computer Science & Engineering — BRAC University (ongoing)
