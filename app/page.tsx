@@ -15,7 +15,8 @@ const LINKS = {
   github: "https://github.com/muhammadTasin",
   linkedin: "https://www.linkedin.com/in/md-tasfiq-tasin-701634359/",
   email: "muhammadtasin18@gmail.com",
-  resume: "/muhammad-tasin-resume.txt",
+  resumePdf: "/Md_Tasfiq_Tasin_ATS_Master_CV.pdf",
+  resumeDocx: "/Md_Tasfiq_Tasin_ATS_Master_CV.docx",
   desiDigest: "https://github.com/muhammadTasin/Desi-Digest-The-Infinity-AI-BuildFest-2026-",
   desiDigestLive: "https://project-rae6k.vercel.app/",
   courseVault: "https://github.com/muhammadTasin/Bracu-coursevault-ai",
@@ -208,7 +209,8 @@ export default function Home() {
     items.push({ id: "nav-about", title: "About", type: "Section", href: "#about" });
     items.push({ id: "nav-contact", title: "Contact", type: "Section", href: "#contact" });
     items.push({ id: "nav-github", title: "GitHub", subtitle: "View my GitHub profile", type: "Link", href: LINKS.github });
-    items.push({ id: "nav-resume", title: "Resume", subtitle: "Download my resume", type: "Link", href: LINKS.resume });
+    items.push({ id: "nav-resume-pdf", title: "Resume (PDF)", subtitle: "Download ATS PDF resume", type: "Link", href: LINKS.resumePdf });
+    items.push({ id: "nav-resume-docx", title: "Resume (Word)", subtitle: "Download ATS Word resume", type: "Link", href: LINKS.resumeDocx });
     return items;
   }, []);
 
@@ -530,7 +532,11 @@ export default function Home() {
                 <article><span>2026</span><div><h3>Infinity AI BuildFest finalist</h3><p>Reached the Top 100 from 3,626 participants with Desi Digest.</p></div></article>
                 <article><span>BRACU</span><div><h3>B.Sc. in Computer Science & Engineering</h3><p>Building foundations in algorithms, software engineering, machine learning and data communications.</p></div></article>
               </div>
-              <div className="about-actions"><a className="button button-ghost" href={LINKS.resume} download>Download resume <span aria-hidden="true">↓</span></a><a className="text-link" href={LINKS.linkedin} target="_blank" rel="noopener noreferrer" aria-label="View LinkedIn profile in a new tab">View LinkedIn <ArrowIcon /></a></div>
+              <div className="about-actions">
+                <a className="button button-ghost" href={LINKS.resumePdf} download>Download ATS CV (PDF) <span aria-hidden="true">↓</span></a>
+                <a className="button button-ghost" href={LINKS.resumeDocx} download>Download ATS CV (Word) <span aria-hidden="true">↓</span></a>
+                <a className="text-link" href={LINKS.linkedin} target="_blank" rel="noopener noreferrer" aria-label="View LinkedIn profile in a new tab">View LinkedIn <ArrowIcon /></a>
+              </div>
             </div>
           </div>
         </section>
