@@ -19,7 +19,10 @@ const LINKS = {
   desiDigest: "https://github.com/muhammadTasin/Desi-Digest-The-Infinity-AI-BuildFest-2026-",
   desiDigestLive: "https://project-rae6k.vercel.app/",
   courseVault: "https://github.com/muhammadTasin/Bracu-coursevault-ai",
+  courseVaultLive: "https://bracu-coursevault-ai.vercel.app",
   latexStudio: "https://github.com/muhammadTasin/Latex-Converter",
+  latexStudioLive: "https://latex-converter-coral.vercel.app",
+  salesBondhu: "https://github.com/muhammadTasin/SalesBondhu-AI",
 };
 
 const NAV_ITEMS = [
@@ -71,7 +74,7 @@ const projects: Project[] = [
     summary: "A production-oriented Flutter platform combining secure backend workflows, GPS visit verification, manager visibility and a context-aware Bangla AI sales coach.",
     accent: "lime",
     type: "Mobile · Backend · AI",
-    visibility: "Private case study",
+    visibility: "Public repository",
     problem: "Field teams need a reliable way to prove visits happened at the correct shop, while officers need practical help planning routes and improving conversion.",
     role: "Product engineering across Flutter, FastAPI, data workflows and applied AI.",
     contribution: "I built and iterated the mobile flows, backend verification logic, manager review surfaces and context-aware Bangla coach experience.",
@@ -85,6 +88,7 @@ const projects: Project[] = [
     features: ["GPS visit verification", "Manager flag review", "Supabase-backed daily plan", "Natural Bangla AI coach", "Backend-driven actions"],
     stack: ["Flutter", "FastAPI", "Python", "Supabase", "PostgreSQL", "JWT", "REST APIs", "LLM integration"],
     architecture: ["Flutter app", "FastAPI API", "Supabase", "AI coach"],
+    github: LINKS.salesBondhu,
   },
   {
     id: "desidigest",
@@ -134,6 +138,7 @@ const projects: Project[] = [
     stack: ["Next.js", "TypeScript", "Supabase", "PostgreSQL", "Three.js", "Zod", "Tailwind CSS"],
     architecture: ["Next.js UI", "Server actions", "Supabase Auth", "Postgres + RLS"],
     github: LINKS.courseVault,
+    live: LINKS.courseVaultLive,
   },
   {
     id: "latex",
@@ -158,6 +163,7 @@ const projects: Project[] = [
     stack: ["Next.js", "TypeScript", "React", "pdf-parse", "Tesseract.js", "Regression tests"],
     architecture: ["Mixed input", "Type detection", "Structure parser", "LaTeX output"],
     github: LINKS.latexStudio,
+    live: LINKS.latexStudioLive,
   },
 ];
 
@@ -584,7 +590,7 @@ export default function Home() {
 
 function CaseFact({ label, text }: { label: string; text: string }) { return <div><span className="case-label">{label}</span><p>{text}</p></div>; }
 
-function SalesVisual() { return <div className="app-scene sales-scene"><aside><b>SB</b><i></i><i></i><i></i></aside><div className="scene-main"><div className="scene-head"><div><small>Today&apos;s route</small><strong>Field visit control</strong></div><span>Private system</span></div><div className="sales-map"><div className="route-line"></div><b className="pin one">1</b><b className="pin two">2</b><b className="pin three">3</b></div><div className="scene-stats"><div><small>Proof</small><strong>GPS</strong></div><div><small>Review</small><strong>Flags</strong></div><div><small>Coach</small><strong>Bangla</strong></div></div></div></div>; }
+function SalesVisual() { return <div className="digest-gallery"><img className="digest-main" src="/images/salesbondhu-today-dashboard.png" width="1600" height="865" alt="SalesBondhu AI dashboard preview" loading="lazy" /><img className="digest-thumb plate-shot" src="/images/salesbondhu-optimized-route.png" width="1600" height="865" alt="SalesBondhu AI route optimization preview" loading="lazy" /><img className="digest-thumb chat-shot" src="/images/salesbondhu-login-role-selection.png" width="1600" height="902" alt="SalesBondhu AI mobile app preview" loading="lazy" /></div>; }
 
 function DigestVisual() { return <div className="digest-gallery"><img className="digest-main" src="/images/desi-dashboard.webp" width="1600" height="865" alt="Desi Digest public product dashboard" loading="lazy" /><img className="digest-thumb plate-shot" src="/images/desi-plate-analysis.webp" width="1600" height="865" alt="Desi Digest plate analysis screen" loading="lazy" /><img className="digest-thumb chat-shot" src="/images/desi-ai-chat.webp" width="1600" height="902" alt="Desi Digest AI nutrition assistant" loading="lazy" /></div>; }
 
