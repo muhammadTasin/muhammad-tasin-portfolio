@@ -556,19 +556,18 @@ export default function Home() {
           <div className="container" data-reveal>
             <div className="contact-grid">
               <div className="contact-copy">
-                <h2 className="sr-only">Have a useful problem to build around?</h2>
+                <h2 className="sr-only">Have an idea worth building?</h2>
                 <h2 aria-hidden="true" className="text-[clamp(2.7rem,5.2vw,5rem)] leading-[0.96] tracking-[-0.067em] font-bold mt-[17px]">
-                  Have a{" "}
+                  Have an{" "}
                   <TypewriterEffect
                     words={[
-                      { text: "useful", className: "text-acid font-normal font-serif text-[clamp(2.7rem,5.2vw,5rem)]" },
-                      { text: "problem", className: "text-acid font-normal font-serif text-[clamp(2.7rem,5.2vw,5rem)]" }
+                      { text: "idea", className: "text-acid font-normal font-serif text-[clamp(2.7rem,5.2vw,5rem)]" }
                     ]}
                     inline={true}
                     loopInterval={15000}
                   />
                   <br />
-                  to <em className="text-acid font-normal font-serif">build around?</em>
+                  worth <em className="text-acid font-normal font-serif">building?</em>
                 </h2>
               </div>
               <div className="contact-form-container">
@@ -594,26 +593,38 @@ export default function Home() {
       </main>
 
       <footer className="site-footer">
-        <div className="container footer-grid">
-          <div className="footer-col">
-            <a className="brand cursor-target" href="#top" aria-label="Back to top">
-              <span className="brand-mark">MT</span>
+        <div className="container">
+          <div className="footer-columns">
+            <div className="footer-column">
+              <span className="footer-label">Based in</span>
+              <span className="footer-value">Dhaka, Bangladesh</span>
+            </div>
+            <div className="footer-column">
+              <span className="footer-label">Open to</span>
+              <span className="footer-value">Internships · Junior roles · Collaborations</span>
+            </div>
+            <div className="footer-column">
+              <span className="footer-label">Response time</span>
+              <span className="footer-value">Usually within 24–48 hours</span>
+            </div>
+          </div>
+          
+          <div className="footer-divider"></div>
+          
+          <div className="footer-bottom-row">
+            <div className="copyright">
+              © 2026 Muhammad Tasin. Built with Next.js, TypeScript and thoughtful systems.
+            </div>
+            <div className="socials">
+              <a href={LINKS.github} target="_blank" rel="noopener noreferrer" className="cursor-target">GitHub</a>
+              <a href={LINKS.linkedin} target="_blank" rel="noopener noreferrer" className="cursor-target">LinkedIn</a>
+              <a href={`mailto:${LINKS.email}`} className="cursor-target">Email</a>
+            </div>
+            <a href="#top" className="back-to-top cursor-target" aria-label="Back to top">
+              Back to top ↑
             </a>
           </div>
-          <div className="footer-col">
-            <strong>Navigation</strong>
-            <a href="#work" className="cursor-target">Work</a>
-            <a href="#expertise" className="cursor-target">Expertise</a>
-            <a href="#about" className="cursor-target">About</a>
-            <a href="#contact" className="cursor-target">Contact</a>
-          </div>
-          <div className="footer-col">
-            <strong>Social</strong>
-            <a href={LINKS.github} target="_blank" rel="noopener noreferrer" className="cursor-target">GitHub</a>
-            <a href={LINKS.linkedin} target="_blank" rel="noopener noreferrer" className="cursor-target">LinkedIn</a>
-          </div>
         </div>
-        <div className="container footer-bottom"><span>© 2026 Muhammad Tasin</span><span>Built with proof, curiosity and care.</span></div>
       </footer>
 
       {selectedProject && <div className="modal-backdrop" role="presentation" onMouseDown={() => setSelectedProject(null)}><section className="case-modal" role="dialog" aria-modal="true" aria-labelledby="case-title" onMouseDown={(event) => event.stopPropagation()}><button className="modal-close" type="button" onClick={() => setSelectedProject(null)} aria-label="Close case study" autoFocus>×</button><div className="modal-heading"><span className="eyebrow">{selectedProject.type} case study</span><h2 id="case-title">{selectedProject.name}</h2><p>{selectedProject.tagline}</p></div><div className="case-grid"><CaseFact label="Context" text={selectedProject.summary} /><CaseFact label="The problem" text={selectedProject.problem} /><CaseFact label="My role" text={selectedProject.role} /><CaseFact label="My contribution" text={selectedProject.contribution} /></div><div className="case-section"><span className="case-label">Architecture</span><div className="architecture-flow">{selectedProject.architecture.map((item, index) => <div key={item}><span>{String(index + 1).padStart(2, "0")}</span><strong>{item}</strong>{index < selectedProject.architecture.length - 1 && <i aria-hidden="true">→</i>}</div>)}</div></div><div className="case-grid detail-grid"><CaseFact label="Core solution" text={selectedProject.solution} /><CaseFact label="Security & reliability" text={selectedProject.reliability} /><CaseFact label="Challenge" text={selectedProject.challenges} /><CaseFact label="Trade-off" text={selectedProject.tradeoffs} /><CaseFact label="Testing & validation" text={selectedProject.testing} /><CaseFact label="Result" text={selectedProject.result} /></div><div className="case-section"><span className="case-label">Technologies</span><div className="tag-row modal-tags">{selectedProject.stack.map((tech) => <span key={tech}>{tech}</span>)}</div></div><div className="modal-actions">{selectedProject.live && <a className="button button-primary" href={selectedProject.live} target="_blank" rel="noopener noreferrer">View live <ArrowIcon /></a>}{selectedProject.github && <a className="button button-ghost" href={selectedProject.github} target="_blank" rel="noopener noreferrer">View repository <ArrowIcon /></a>}{!selectedProject.github && <span className="private-note">Private project · no repository link exposed</span>}</div></section></div>}
