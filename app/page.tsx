@@ -183,13 +183,27 @@ const BACKEND_CI_STATS_URL =
 
 type BackendCiStats = {
   backendRepositoryCount: number;
+
   github: {
     year: number;
     authoredCommits: number;
+    longestContributionStreak?: number;
+    activeContributionDays?: number;
   };
+
+  tests?: {
+    passed: number;
+    failed: number;
+    skipped: number;
+    total: number;
+    reportingRepositoryCount: number;
+    allLatestSuitesPassing: boolean;
+  };
+
   summary: {
     successRate: number | null;
   };
+
   repositories: Array<{
     ci: {
       available: boolean;
@@ -443,21 +457,37 @@ export default function Home() {
             </div>
           </div>
           <a className="scroll-cue" href="#work"><span>Scroll to work</span><i aria-hidden="true">↓</i></a>
-          <div className="signal-strip container" aria-label="Highlights" data-reveal>
-            <div><strong>Top 100</strong><span>Infinity AI BuildFest 2026</span></div>
-            <div><strong>04</strong><span>Featured product builds</span></div>
+          <div
+            className="signal-strip container"
+            aria-label="Career and product highlights"
+            data-reveal
+          >
+            <div>
+              <strong>Top 100</strong>
+              <span>Infinity AI BuildFest 2026</span>
+            </div>
+
+            <div>
+              <strong>
+                {String(projects.length).padStart(2, "0")}
+              </strong>
+              <span>Featured product builds</span>
+            </div>
+
             <div>
               <strong>
                 {backendCi
                   ? backendCi.github.authoredCommits.toLocaleString()
                   : "—"}
               </strong>
+
               <span>
                 {backendCi
-                  ? `GitHub commits in ${backendCi.github.year}`
+                  ? `Authored commits · ${backendCi.github.year}`
                   : "Loading GitHub activity"}
               </span>
             </div>
+
             <div>
               <strong>
                 {backendCi
@@ -466,8 +496,180 @@ export default function Home() {
                     ).padStart(2, "0")
                   : "—"}
               </strong>
-              <span>Backend/full-stack repositories</span>
+
+              <span>
+                Backend &amp; full-stack repositories
+              </span>
             </div>
+          </div>
+        </section>
+
+        <section
+          className="engineering-proof-section"
+          aria-labelledby="engineering-proof-title"
+        >
+          <div className="container">
+            <div
+              className="engineering-proof-heading"
+              data-reveal
+            >
+              <div>
+                <span className="eyebrow">
+                  Live engineering evidence
+                </span>
+
+                <h2 id="engineering-proof-title">
+                  Measured work.
+                  <br />
+                  <em>Not just claims.</em>
+                </h2>
+              </div>
+
+              <p>
+                Live signals collected from my GitHub repositories,
+                automated test pipelines and contribution activity.
+                Repositories without verified test reports are never
+                counted as passing.
+              </p>
+            </div>
+
+            <div
+              className="engineering-proof-grid"
+              data-reveal
+            >
+              <article className="engineering-proof-card">
+                <div className="engineering-proof-card-top">
+                  <span className="engineering-proof-label">
+                    Automated tests
+                  </span>
+
+                  <span
+                    className={`engineering-proof-status ${
+                      backendCi?.tests
+                        ?.allLatestSuitesPassing
+                        ? "is-passing"
+                        : ""
+                    }`}
+                  >
+                    <i aria-hidden="true" />
+
+                    {backendCi?.tests
+                      ? backendCi.tests
+                          .allLatestSuitesPassing
+                        ? "Passing"
+                        : "Review"
+                      : "Collecting"}
+                  </span>
+                </div>
+
+                <strong className="engineering-proof-value">
+                  {backendCi?.tests &&
+                  backendCi.tests
+                    .reportingRepositoryCount > 0
+                    ? backendCi.tests.passed
+                        .toLocaleString()
+                    : "—"}
+                </strong>
+
+                <p>
+                  {backendCi?.tests &&
+                  backendCi.tests
+                    .reportingRepositoryCount > 0
+                    ? "Tests passing in latest suites"
+                    : "Awaiting the first verified test scan"}
+                </p>
+              </article>
+
+              <article className="engineering-proof-card">
+                <div className="engineering-proof-card-top">
+                  <span className="engineering-proof-label">
+                    Test coverage
+                  </span>
+
+                  <span className="engineering-proof-index">
+                    02
+                  </span>
+                </div>
+
+                <strong className="engineering-proof-value">
+                  {backendCi?.tests &&
+                  backendCi.tests
+                    .reportingRepositoryCount > 0
+                    ? String(
+                        backendCi.tests
+                          .reportingRepositoryCount,
+                      ).padStart(2, "0")
+                    : "—"}
+                </strong>
+
+                <p>
+                  Repositories publishing verified test
+                  reports
+                </p>
+              </article>
+
+              <article className="engineering-proof-card">
+                <div className="engineering-proof-card-top">
+                  <span className="engineering-proof-label">
+                    Consistency
+                  </span>
+
+                  <span className="engineering-proof-index">
+                    03
+                  </span>
+                </div>
+
+                <strong className="engineering-proof-value">
+                  {typeof backendCi?.github
+                    .longestContributionStreak === "number"
+                    ? `${
+                        backendCi.github
+                          .longestContributionStreak
+                      }d`
+                    : "—"}
+                </strong>
+
+                <p>
+                  Longest contribution streak in{" "}
+                  {backendCi?.github.year ?? "2026"}
+                </p>
+              </article>
+
+              <article className="engineering-proof-card">
+                <div className="engineering-proof-card-top">
+                  <span className="engineering-proof-label">
+                    Active days
+                  </span>
+
+                  <span className="engineering-proof-index">
+                    04
+                  </span>
+                </div>
+
+                <strong className="engineering-proof-value">
+                  {typeof backendCi?.github
+                    .activeContributionDays === "number"
+                    ? backendCi.github
+                        .activeContributionDays
+                        .toLocaleString()
+                    : "—"}
+                </strong>
+
+                <p>
+                  Contribution days recorded in{" "}
+                  {backendCi?.github.year ?? "2026"}
+                </p>
+              </article>
+            </div>
+
+            <p
+              className="engineering-proof-note"
+              data-reveal
+            >
+              Live values refresh automatically. Missing
+              evidence is displayed as unavailable rather
+              than estimated.
+            </p>
           </div>
         </section>
 
