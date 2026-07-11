@@ -286,19 +286,39 @@ def detect_configuration(
                     "portfolio-jest.json",
             }
 
-        if "node --test" in test_script.lower():
+        node_test_marker = "node --test"
+        node_test_index = test_script.lower().find(
+            node_test_marker
+        )
+
+        if node_test_index >= 0:
+            prefix = test_script[:node_test_index]
+
+            test_targets = test_script[
+                node_test_index
+                + len(node_test_marker):
+            ].strip()
+
+            node_test_command = (
+                f"{prefix}node --test "
+                "--test-reporter=junit "
+                "--test-reporter-destination="
+                "portfolio-junit.xml"
+            )
+
+            if test_targets:
+                node_test_command += (
+                    f" {test_targets}"
+                )
+
             return {
                 "runtime": "node-test",
                 "workingDirectory":
                     relative_directory,
                 "installCommand":
                     install_command,
-                "testCommand": (
-                    "npm test -- "
-                    "--test-reporter=junit "
-                    "--test-reporter-destination="
-                    "portfolio-junit.xml"
-                ),
+                "testCommand":
+                    node_test_command,
                 "resultType": "junit",
                 "resultPath":
                     "portfolio-junit.xml",
