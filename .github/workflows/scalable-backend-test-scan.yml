@@ -177,10 +177,8 @@ jobs:
               f'{result["message"]}'
           )
 
-          if status == "failing":
-              raise SystemExit(message)
-
           if status in {
+              "failing",
               "error",
               "not-configured",
           }:
