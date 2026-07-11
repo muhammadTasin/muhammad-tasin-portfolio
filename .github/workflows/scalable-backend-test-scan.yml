@@ -53,6 +53,8 @@ jobs:
           path: controller
 
       - name: Checkout backend repository
+        id: target_checkout
+        continue-on-error: true
         uses: actions/checkout@v4
         with:
           repository: ${{ matrix.full_name }}
@@ -61,16 +63,19 @@ jobs:
           path: target
 
       - name: Set up Python
+        if: steps.target_checkout.outcome == 'success'
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
       - name: Set up Node.js
+        if: steps.target_checkout.outcome == 'success'
         uses: actions/setup-node@v4
         with:
           node-version: "22"
 
       - name: Run detected tests
+        if: steps.target_checkout.outcome == 'success'
         env:
           REPOSITORY_FULL_NAME: ${{ matrix.full_name }}
           REPOSITORY_DEFAULT_BRANCH: ${{ matrix.default_branch }}
@@ -79,6 +84,62 @@ jobs:
             controller/scripts/backend-stats/run-backend-tests.py \
             target \
             "result/${{ matrix.artifact_key }}.json"
+
+      - name: Record checkout failure
+        if: steps.target_checkout.outcome != 'success'
+        env:
+          REPOSITORY_FULL_NAME: ${{ matrix.full_name }}
+          REPOSITORY_DEFAULT_BRANCH: ${{ matrix.default_branch }}
+          RESULT_FILE: result/${{ matrix.artifact_key }}.json
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          output = Path(
+              os.environ["RESULT_FILE"]
+          )
+
+          output.parent.mkdir(
+              parents=True,
+              exist_ok=True,
+          )
+
+          payload = {
+              "repository":
+                  os.environ[
+                      "REPOSITORY_FULL_NAME"
+                  ],
+              "defaultBranch":
+                  os.environ[
+                      "REPOSITORY_DEFAULT_BRANCH"
+                  ],
+              "status": "error",
+              "runtime": None,
+              "workingDirectory": None,
+              "passed": 0,
+              "failed": 0,
+              "skipped": 0,
+              "total": 0,
+              "updatedAt": datetime.now(
+                  timezone.utc
+              ).isoformat(),
+              "message": (
+                  "Repository checkout failed. "
+                  "Verify token repository access "
+                  "and Contents: Read permission."
+              ),
+          }
+
+          output.write_text(
+              json.dumps(payload, indent=2),
+              encoding="utf-8",
+          )
+
+          print(json.dumps(payload, indent=2))
+          PY
 
       - name: Upload repository result
         if: always()
@@ -91,7 +152,7 @@ jobs:
           retention-days: 90
           if-no-files-found: error
 
-      - name: Mark failing test suites
+      - name: Evaluate repository result
         if: always()
         env:
           RESULT_FILE: result/${{ matrix.artifact_key }}.json
@@ -107,20 +168,27 @@ jobs:
               ).read_text(encoding="utf-8")
           )
 
-          if result["status"] in {
-              "failing",
-              "error",
-          }:
-              raise SystemExit(
-                  f'{result["repository"]}: '
-                  f'{result["status"]} - '
-                  f'{result["message"]}'
-              )
+          status = result["status"]
 
-          print(
+          message = (
               f'{result["repository"]}: '
-              f'{result["status"]}'
+              f'{status} - '
+              f'{result["message"]}'
           )
+
+          if status == "failing":
+              raise SystemExit(message)
+
+          if status in {
+              "error",
+              "not-configured",
+          }:
+              print(
+                  f"::warning title="
+                  f"Backend test scan::{message}"
+              )
+          else:
+              print(message)
           PY
 
   aggregate:
