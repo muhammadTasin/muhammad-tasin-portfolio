@@ -102,14 +102,36 @@ export async function loadLatestBackendTestSummary(
     return null;
   }
 
-  const zipResponse = await fetch(
+  const downloadResponse = await fetch(
     `https://api.github.com/repos/${owner}/${repository}` +
       `/actions/artifacts/${artifact.id}/zip`,
     {
       headers: githubHeaders(token),
-      redirect: "follow",
+      redirect: "manual",
     },
   );
+
+  let zipResponse: Response;
+
+  if (
+    downloadResponse.status >= 300 &&
+    downloadResponse.status < 400
+  ) {
+    const location =
+      downloadResponse.headers.get("location");
+
+    if (!location) {
+      throw new Error(
+        "Artifact redirect URL was not provided.",
+      );
+    }
+
+    // The redirect URL is already signed.
+    // Do not forward the GitHub Authorization header.
+    zipResponse = await fetch(location);
+  } else {
+    zipResponse = downloadResponse;
+  }
 
   if (!zipResponse.ok) {
     throw new Error(
