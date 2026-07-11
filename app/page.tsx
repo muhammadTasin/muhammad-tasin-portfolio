@@ -342,14 +342,62 @@ export default function Home() {
 
     void loadBackendCi();
 
-    const refreshTimer = window.setInterval(
-      () => void loadBackendCi(),
-      60_000,
+    const DHAKA_OFFSET_MS =
+      6 * 60 * 60 * 1000;
+
+    function millisecondsUntilNextDailyRefresh() {
+      const dhakaNow = new Date(
+        Date.now() + DHAKA_OFFSET_MS,
+      );
+
+      const nextRefresh = new Date(dhakaNow);
+
+      // Refresh at 12:10 AM Bangladesh time,
+      // allowing the midnight workflow to finish.
+      nextRefresh.setUTCHours(0, 10, 0, 0);
+
+      if (nextRefresh <= dhakaNow) {
+        nextRefresh.setUTCDate(
+          nextRefresh.getUTCDate() + 1,
+        );
+      }
+
+      return (
+        nextRefresh.getTime() -
+        dhakaNow.getTime()
+      );
+    }
+
+    let dailyRefreshInterval:
+      number | undefined;
+
+    const dailyRefreshTimer = window.setTimeout(
+      () => {
+        void loadBackendCi();
+
+        dailyRefreshInterval =
+          window.setInterval(
+            () => void loadBackendCi(),
+            24 * 60 * 60 * 1000,
+          );
+      },
+      millisecondsUntilNextDailyRefresh(),
     );
 
     return () => {
       cancelled = true;
-      window.clearInterval(refreshTimer);
+
+      window.clearTimeout(
+        dailyRefreshTimer,
+      );
+
+      if (
+        dailyRefreshInterval !== undefined
+      ) {
+        window.clearInterval(
+          dailyRefreshInterval,
+        );
+      }
     };
   }, []);
 
@@ -666,9 +714,9 @@ export default function Home() {
               className="engineering-proof-note"
               data-reveal
             >
-              Live values refresh automatically. Missing
-              evidence is displayed as unavailable rather
-              than estimated.
+              Daily snapshot · Refreshes nightly after
+              12:00 AM Bangladesh time. Missing evidence is
+              shown as unavailable, never estimated.
             </p>
           </div>
         </section>
