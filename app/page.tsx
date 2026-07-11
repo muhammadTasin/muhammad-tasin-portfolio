@@ -178,6 +178,25 @@ const expertise = [
 
 const keywords = ["Backend", "Applied AI", "Flutter", "Product systems"];
 
+const BACKEND_CI_STATS_URL =
+  "https://nsiyjrhplawzooopgtox.supabase.co/functions/v1/backend-ci-stats";
+
+type BackendCiStats = {
+  backendRepositoryCount: number;
+  github: {
+    year: number;
+    authoredCommits: number;
+  };
+  summary: {
+    successRate: number | null;
+  };
+  repositories: Array<{
+    ci: {
+      available: boolean;
+    };
+  }>;
+};
+
 function ArrowIcon() { return <span className="arrow-icon" aria-hidden="true">↗</span>; }
 
 export default function Home() {
@@ -190,6 +209,8 @@ export default function Home() {
   const [activeSection, setActiveSection] = useState("top");
   const [emailCopied, setEmailCopied] = useState(false);
   const [keywordIndex, setKeywordIndex] = useState(0);
+  const [backendCi, setBackendCi] =
+    useState<BackendCiStats | null>(null);
 
   const navItems = useMemo(() => [
     { label: "Work", href: "#work" },
@@ -271,6 +292,51 @@ export default function Home() {
     window.addEventListener("resize", handleResize, { passive: true });
 
     return () => { window.clearInterval(clock); if (keyword) window.clearInterval(keyword); observer?.disconnect(); sectionObserver.disconnect(); window.removeEventListener("resize", handleResize); };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadBackendCi() {
+      try {
+        const response = await fetch(
+          `${BACKEND_CI_STATS_URL}?t=${Date.now()}`,
+          {
+            cache: "no-store",
+          },
+        );
+
+        if (!response.ok) {
+          throw new Error(
+            `Backend CI request failed: ${response.status}`,
+          );
+        }
+
+        const data =
+          (await response.json()) as BackendCiStats;
+
+        if (!cancelled) {
+          setBackendCi(data);
+        }
+      } catch (error) {
+        console.error(
+          "Unable to load live backend CI statistics:",
+          error,
+        );
+      }
+    }
+
+    void loadBackendCi();
+
+    const refreshTimer = window.setInterval(
+      () => void loadBackendCi(),
+      60_000,
+    );
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(refreshTimer);
+    };
   }, []);
 
   useEffect(() => {
@@ -380,8 +446,28 @@ export default function Home() {
           <div className="signal-strip container" aria-label="Highlights" data-reveal>
             <div><strong>Top 100</strong><span>Infinity AI BuildFest 2026</span></div>
             <div><strong>04</strong><span>Featured product builds</span></div>
-            <div><strong>159</strong><span>Backend tests passed</span></div>
-            <div><strong>BRACU</strong><span>Computer Science student</span></div>
+            <div>
+              <strong>
+                {backendCi
+                  ? backendCi.github.authoredCommits.toLocaleString()
+                  : "—"}
+              </strong>
+              <span>
+                {backendCi
+                  ? `GitHub commits in ${backendCi.github.year}`
+                  : "Loading GitHub activity"}
+              </span>
+            </div>
+            <div>
+              <strong>
+                {backendCi
+                  ? String(
+                      backendCi.backendRepositoryCount,
+                    ).padStart(2, "0")
+                  : "—"}
+              </strong>
+              <span>Backend/full-stack repositories</span>
+            </div>
           </div>
         </section>
 
