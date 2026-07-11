@@ -1,5 +1,8 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { withSupabase } from "npm:@supabase/server@^1";
+import {
+  loadLatestBackendTestSummary,
+} from "./github_snapshot.ts";
 
 const GITHUB_OWNER =
   Deno.env.get("GITHUB_OWNER") ?? "muhammadTasin";
@@ -162,6 +165,21 @@ export default {
         `/user/repos?per_page=100&sort=updated&visibility=all&affiliation=owner`,
       );
 
+      const testSummary = GITHUB_TOKEN
+        ? await loadLatestBackendTestSummary(
+            GITHUB_TOKEN,
+            GITHUB_OWNER,
+            "muhammad-tasin-portfolio",
+          ).catch((error) => {
+            console.error(
+              "Could not load backend test summary:",
+              error,
+            );
+
+            return null;
+          })
+        : null;
+
       const currentYear = new Date().getUTCFullYear();
       const yearStart =
         `${currentYear}-01-01T00:00:00Z`;
@@ -301,12 +319,49 @@ export default {
 
       return jsonResponse({
         owner: GITHUB_OWNER,
-        generatedAt: new Date().toISOString(),
-        backendRepositoryCount: repositoryStats.length,
+        generatedAt:
+          testSummary?.generatedAt ??
+          new Date().toISOString(),
+
+        backendRepositoryCount:
+          testSummary
+            ?.expectedRepositoryCount ??
+          repositoryStats.length,
+
         github: {
           year: currentYear,
-          authoredCommits: authoredCommitsThisYear,
+          authoredCommits:
+            authoredCommitsThisYear,
         },
+
+        tests: testSummary
+          ? {
+              passed: testSummary.passed,
+              failed: testSummary.failed,
+              skipped: testSummary.skipped,
+              total: testSummary.total,
+
+              reportingRepositoryCount:
+                testSummary
+                  .reportingRepositoryCount,
+
+              notConfiguredRepositoryCount:
+                testSummary
+                  .notConfiguredRepositoryCount,
+
+              errorRepositoryCount:
+                testSummary
+                  .errorRepositoryCount,
+
+              allLatestSuitesPassing:
+                testSummary
+                  .allReportingSuitesPassing,
+
+              snapshotAt:
+                testSummary.generatedAt,
+            }
+          : null,
+
         summary: {
           totalRecentRuns: totalRuns,
           completedRecentRuns: completedRuns,
