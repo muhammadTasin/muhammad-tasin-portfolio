@@ -48,3 +48,8 @@ next-env.d.ts
 /outputs/
 /work/
 *.tsbuildinfo
+
+__pycache__/
+*.py[cod]
+
+supabase/.temp/

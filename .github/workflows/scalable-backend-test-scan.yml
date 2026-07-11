@@ -1,0 +1,267 @@
+name: Scalable Backend Test Scan
+
+on:
+  workflow_dispatch:
+
+  schedule:
+    - cron: "23 */6 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: scalable-backend-test-scan
+  cancel-in-progress: true
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+
+    outputs:
+      matrix: ${{ steps.repositories.outputs.matrix }}
+      count: ${{ steps.repositories.outputs.count }}
+
+    steps:
+      - name: Checkout controller repository
+        uses: actions/checkout@v4
+
+      - name: Discover backend repositories
+        id: repositories
+        env:
+          BACKEND_REPOS_TOKEN: ${{ secrets.BACKEND_REPOS_TOKEN }}
+          GITHUB_OWNER: muhammadTasin
+        run: |
+          python3 scripts/backend-stats/discover.py
+
+  scan:
+    needs: discover
+
+    if: needs.discover.outputs.count != '0'
+
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix: ${{ fromJSON(needs.discover.outputs.matrix) }}
+
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout controller repository
+        uses: actions/checkout@v4
+        with:
+          path: controller
+
+      - name: Checkout backend repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ matrix.full_name }}
+          ref: ${{ matrix.default_branch }}
+          token: ${{ secrets.BACKEND_REPOS_TOKEN }}
+          path: target
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Run detected tests
+        env:
+          REPOSITORY_FULL_NAME: ${{ matrix.full_name }}
+          REPOSITORY_DEFAULT_BRANCH: ${{ matrix.default_branch }}
+        run: |
+          python3 \
+            controller/scripts/backend-stats/run-backend-tests.py \
+            target \
+            "result/${{ matrix.artifact_key }}.json"
+
+      - name: Upload repository result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name:
+            backend-test-${{ matrix.artifact_key }}
+          path:
+            result/${{ matrix.artifact_key }}.json
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Mark failing test suites
+        if: always()
+        env:
+          RESULT_FILE: result/${{ matrix.artifact_key }}.json
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          result = json.loads(
+              Path(
+                  os.environ["RESULT_FILE"]
+              ).read_text(encoding="utf-8")
+          )
+
+          if result["status"] in {
+              "failing",
+              "error",
+          }:
+              raise SystemExit(
+                  f'{result["repository"]}: '
+                  f'{result["status"]} - '
+                  f'{result["message"]}'
+              )
+
+          print(
+              f'{result["repository"]}: '
+              f'{result["status"]}'
+          )
+          PY
+
+  aggregate:
+    needs:
+      - discover
+      - scan
+
+    if: ${{ always() && needs.discover.result == 'success' }}
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download repository results
+        if: needs.discover.outputs.count != '0'
+        uses: actions/download-artifact@v4
+        with:
+          pattern: backend-test-*
+          path: collected
+          merge-multiple: true
+
+      - name: Build aggregate summary
+        env:
+          EXPECTED_REPOSITORY_COUNT: ${{ needs.discover.outputs.count }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          collected = Path("collected")
+
+          files = (
+              sorted(collected.glob("*.json"))
+              if collected.exists()
+              else []
+          )
+
+          repositories = [
+              json.loads(
+                  path.read_text(
+                      encoding="utf-8"
+                  )
+              )
+              for path in files
+          ]
+
+          reporting = [
+              item
+              for item in repositories
+              if item["status"] in {
+                  "passing",
+                  "failing",
+              }
+          ]
+
+          summary = {
+              "generatedAt": datetime.now(
+                  timezone.utc
+              ).isoformat(),
+
+              "expectedRepositoryCount": int(
+                  os.environ.get(
+                      "EXPECTED_REPOSITORY_COUNT",
+                      "0",
+                  )
+              ),
+
+              "scannedRepositoryCount":
+                  len(repositories),
+
+              "reportingRepositoryCount":
+                  len(reporting),
+
+              "notConfiguredRepositoryCount":
+                  sum(
+                      item["status"]
+                      == "not-configured"
+                      for item in repositories
+                  ),
+
+              "errorRepositoryCount":
+                  sum(
+                      item["status"] == "error"
+                      for item in repositories
+                  ),
+
+              "passed": sum(
+                  item["passed"]
+                  for item in reporting
+              ),
+
+              "failed": sum(
+                  item["failed"]
+                  for item in reporting
+              ),
+
+              "skipped": sum(
+                  item["skipped"]
+                  for item in reporting
+              ),
+
+              "total": sum(
+                  item["total"]
+                  for item in reporting
+              ),
+
+              "allReportingSuitesPassing": (
+                  len(reporting) > 0
+                  and all(
+                      item["status"]
+                      == "passing"
+                      for item in reporting
+                  )
+              ),
+
+              "repositories": repositories,
+          }
+
+          Path(
+              "backend-test-summary.json"
+          ).write_text(
+              json.dumps(
+                  summary,
+                  indent=2,
+              ),
+              encoding="utf-8",
+          )
+
+          print(
+              json.dumps(
+                  summary,
+                  indent=2,
+              )
+          )
+          PY
+
+      - name: Upload aggregate summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-summary
+          path: backend-test-summary.json
+          retention-days: 90
+          if-no-files-found: error
