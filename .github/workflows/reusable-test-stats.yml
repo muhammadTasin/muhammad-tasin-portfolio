@@ -1,0 +1,188 @@
+name: Reusable Test Statistics
+
+on:
+  workflow_call:
+    inputs:
+      runtime:
+        description: Runtime used by the caller repository
+        required: true
+        type: string
+
+      working-directory:
+        description: Directory containing the application or backend
+        required: false
+        type: string
+        default: "."
+
+      node-version:
+        required: false
+        type: string
+        default: "22"
+
+      python-version:
+        required: false
+        type: string
+        default: "3.12"
+
+      install-command:
+        description: Command used to install dependencies
+        required: true
+        type: string
+
+      test-command:
+        description: Command that runs tests and produces JUnit XML
+        required: true
+        type: string
+
+      junit-path:
+        description: JUnit XML path relative to repository root
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  test-and-publish-statistics:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout caller repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        if: inputs.runtime == 'node'
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
+
+      - name: Set up Python
+        if: inputs.runtime == 'python'
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python-version }}
+
+      - name: Validate runtime
+        shell: bash
+        run: |
+          case "${{ inputs.runtime }}" in
+            node|python)
+              echo "Runtime accepted: ${{ inputs.runtime }}"
+              ;;
+            *)
+              echo "Unsupported runtime: ${{ inputs.runtime }}"
+              exit 1
+              ;;
+          esac
+
+      - name: Install dependencies
+        working-directory: ${{ inputs.working-directory }}
+        shell: bash
+        run: ${{ inputs.install-command }}
+
+      - name: Run automated tests
+        id: automated_tests
+        continue-on-error: true
+        working-directory: ${{ inputs.working-directory }}
+        shell: bash
+        run: ${{ inputs.test-command }}
+
+      - name: Generate portfolio test statistics
+        if: always()
+        env:
+          JUNIT_PATTERN: ${{ inputs.junit-path }}
+          TEST_OUTCOME: ${{ steps.automated_tests.outcome }}
+        shell: bash
+        run: |
+          python3 - <<'PYTHON'
+          from __future__ import annotations
+
+          import glob
+          import json
+          import os
+          import xml.etree.ElementTree as ET
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+
+          def local_name(tag: str) -> str:
+              return tag.rsplit("}", 1)[-1]
+
+
+          pattern = os.environ["JUNIT_PATTERN"]
+          result_files = sorted(glob.glob(pattern, recursive=True))
+
+          if not result_files:
+              raise SystemExit(
+                  f"No JUnit XML files matched: {pattern}"
+              )
+
+          passed = 0
+          failed = 0
+          skipped = 0
+
+          for result_file in result_files:
+              root = ET.parse(result_file).getroot()
+
+              for testcase in root.iter():
+                  if local_name(testcase.tag) != "testcase":
+                      continue
+
+                  child_tags = {
+                      local_name(child.tag)
+                      for child in list(testcase)
+                  }
+
+                  if "failure" in child_tags or "error" in child_tags:
+                      failed += 1
+                  elif "skipped" in child_tags:
+                      skipped += 1
+                  else:
+                      passed += 1
+
+          test_outcome = os.environ.get(
+              "TEST_OUTCOME",
+              "failure",
+          )
+
+          payload = {
+              "repository": os.environ["GITHUB_REPOSITORY"],
+              "commitSha": os.environ["GITHUB_SHA"],
+              "runId": os.environ["GITHUB_RUN_ID"],
+              "passed": passed,
+              "failed": failed,
+              "skipped": skipped,
+              "total": passed + failed + skipped,
+              "status": (
+                  "passing"
+                  if test_outcome == "success" and failed == 0
+                  else "failing"
+              ),
+              "updatedAt": datetime.now(
+                  timezone.utc
+              ).isoformat(),
+              "junitFiles": result_files,
+          }
+
+          output = Path("portfolio-test-stats.json")
+          output.write_text(
+              json.dumps(payload, indent=2),
+              encoding="utf-8",
+          )
+
+          print(json.dumps(payload, indent=2))
+          PYTHON
+
+      - name: Upload portfolio test statistics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: portfolio-test-stats
+          path: portfolio-test-stats.json
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Preserve failing test status
+        if: steps.automated_tests.outcome == 'failure'
+        shell: bash
+        run: exit 1
