@@ -1,10 +1,10 @@
-# Muhammad Tasin — Developer Portfolio
+# Md. Tasfiq Tasin — Developer Portfolio
 
-Source-controlled backup of Muhammad Tasin's current developer portfolio.
+Source-controlled backup of Md. Tasfiq Tasin's current developer portfolio.
 
 ## Professional positioning
 
-Muhammad Tasin is an AI-focused backend developer and full-stack and Flutter app developer. The portfolio presents selected work across LLM integration, RAG workflows, REST APIs, FastAPI, databases, Supabase, Flutter, React, and Next.js.
+Md. Tasfiq Tasin is an AI-focused backend developer and full-stack and Flutter app developer. The portfolio presents selected work across LLM integration, RAG workflows, REST APIs, FastAPI, databases, Supabase, Flutter, React, and Next.js.
 
 ## Technology stack
 
