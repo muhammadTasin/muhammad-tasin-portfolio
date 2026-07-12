@@ -3,6 +3,9 @@ import { withSupabase } from "npm:@supabase/server@^1";
 import {
   loadLatestBackendTestSummary,
 } from "./github_snapshot.ts";
+import {
+  loadContributionSnapshot,
+} from "./github_contributions.ts";
 
 const GITHUB_OWNER =
   Deno.env.get("GITHUB_OWNER") ?? "muhammadTasin";
@@ -180,6 +183,25 @@ export default {
           })
         : null;
 
+      const snapshotAt =
+        testSummary?.generatedAt ??
+        new Date().toISOString();
+
+      const contributionSnapshot = GITHUB_TOKEN
+        ? await loadContributionSnapshot(
+            GITHUB_TOKEN,
+            GITHUB_OWNER,
+            snapshotAt,
+          ).catch((error) => {
+            console.error(
+              "Could not load GitHub contribution snapshot:",
+              error,
+            );
+
+            return null;
+          })
+        : null;
+
       const currentYear = new Date().getUTCFullYear();
       const yearStart =
         `${currentYear}-01-01T00:00:00Z`;
@@ -319,9 +341,7 @@ export default {
 
       return jsonResponse({
         owner: GITHUB_OWNER,
-        generatedAt:
-          testSummary?.generatedAt ??
-          new Date().toISOString(),
+        generatedAt: snapshotAt,
 
         backendRepositoryCount:
           testSummary
@@ -330,8 +350,24 @@ export default {
 
         github: {
           year: currentYear,
+
           authoredCommits:
             authoredCommitsThisYear,
+
+          longestContributionStreak:
+            contributionSnapshot
+              ?.longestContributionStreak ??
+            null,
+
+          activeContributionDays:
+            contributionSnapshot
+              ?.activeContributionDays ??
+            null,
+
+          snapshotAt:
+            contributionSnapshot
+              ?.snapshotAt ??
+            null,
         },
 
         tests: testSummary
