@@ -440,9 +440,9 @@ export default function Home() {
       <GradualBlur position="top" height="100px" strength={10} divCount={4} />
       <a className="skip-link" href="#main">Skip to content</a>
       <header className="site-header">
-        <a className="brand cursor-target" href="#top" aria-label="Muhammad Tasin home">
+        <a className="brand cursor-target" href="#top" aria-label="Md. Tasfiq Tasin home">
           <span className="brand-mark">MT</span>
-          <span className="brand-copy"><strong>Muhammad Tasin</strong><small>AI · Backend · Flutter</small></span>
+          <span className="brand-copy"><strong>Md. Tasfiq Tasin</strong><small>AI · Backend · Flutter</small></span>
         </a>
         <PillNav
           className=""
@@ -805,7 +805,7 @@ export default function Home() {
           <div className="container">
             <div className="github-intro" data-reveal>
               <div><span className="eyebrow">Open-source footprint</span><h2>More experiments<br />and <em>builds.</em></h2></div>
-              <div><p>A curated view of public repositories. Flagship projects remain intentionally selected rather than changing with GitHub&apos;s recent-update order.</p><a className="button button-primary" href={LINKS.github} target="_blank" rel="noopener noreferrer" aria-label="Browse all Muhammad Tasin repositories on GitHub in a new tab">Browse all repositories <ArrowIcon /></a></div>
+              <div><p>A curated view of public repositories. Flagship projects remain intentionally selected rather than changing with GitHub&apos;s recent-update order.</p><a className="button button-primary" href={LINKS.github} target="_blank" rel="noopener noreferrer" aria-label="Browse all Md. Tasfiq Tasin repositories on GitHub in a new tab">Browse all repositories <ArrowIcon /></a></div>
             </div>
             <div className="repo-grid">
               {repositories.map((repo, index) => <a className="repo-card" key={repo.name} href={repo.url} target="_blank" rel="noopener noreferrer" aria-label={`Open ${repo.name} repository in a new tab`} data-reveal><span className="repo-index">0{index + 1}</span><div><span className="repo-language"><i></i>{repo.language}</span><h3>{repo.name}</h3><p>{repo.description}</p></div><ArrowIcon /></a>)}
@@ -865,7 +865,7 @@ export default function Home() {
           <div className="container about-grid">
             <div className="about-sticky" data-reveal><span className="eyebrow">About</span><h2>Curious by nature.<br /><em>Practical by design.</em></h2></div>
             <div className="about-content" data-reveal>
-              <p className="about-lead">I&apos;m Muhammad Tasin, a CSE student at BRAC University in Bangladesh, focused on building useful AI-powered products without overstating what they do.</p>
+              <p className="about-lead">I&apos;m Md. Tasfiq Tasin, a CSE student at BRAC University in Bangladesh, focused on building useful AI-powered products without overstating what they do.</p>
               <p>I work where backend logic, databases, mobile interfaces and language models meet. I care about the part after the demo: security boundaries, error handling, useful context, test coverage and a clear experience for the person using the product.</p>
               <div className="timeline">
                 <article><span>Now</span><div><h3>AI-focused product development</h3><p>Deepening backend, Flutter, LLM integration and system design through production-oriented projects.</p></div></article>
@@ -949,7 +949,7 @@ export default function Home() {
           
           <div className="footer-bottom-row">
             <div className="copyright">
-              © 2026 Muhammad Tasin. Built with Next.js, TypeScript and thoughtful systems.
+              © 2026 Md. Tasfiq Tasin. Built with Next.js, TypeScript and thoughtful systems.
             </div>
             <div className="socials">
               <a href={LINKS.github} target="_blank" rel="noopener noreferrer" className="cursor-target">GitHub</a>
@@ -972,7 +972,7 @@ export default function Home() {
             <div className="modal-heading">
               <span className="eyebrow">Curriculum Vitae</span>
               <h2 id="cv-modal-title">Download Resume</h2>
-              <p>Get a copy of Muhammad Tasin&apos;s ATS-friendly professional resume in your preferred format.</p>
+              <p>Get a copy of Md. Tasfiq Tasin&apos;s ATS-friendly professional resume in your preferred format.</p>
             </div>
             
             <div style={{ display: "grid", gap: "16px", margin: "24px 0" }}>
@@ -999,7 +999,7 @@ export default function Home() {
         </div>
       )}
 
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ "@context": "https://schema.org", "@type": "Person", name: "Muhammad Tasin", jobTitle: "AI-Focused Backend Developer | Full-Stack & Flutter App Developer", email: `mailto:${LINKS.email}`, sameAs: [LINKS.github, LINKS.linkedin], alumniOf: { "@type": "CollegeOrUniversity", name: "BRAC University" }, knowsAbout: ["FastAPI", "Flutter", "LLM integration", "RAG", "React", "Supabase"], subjectOf: projects.map((project) => ({ "@type": "CreativeWork", name: project.name, description: project.summary, ...(project.github ? { url: project.github } : {}) })) }) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ "@context": "https://schema.org", "@type": "Person", name: "Md. Tasfiq Tasin", jobTitle: "AI-Focused Backend Developer | Full-Stack & Flutter App Developer", email: `mailto:${LINKS.email}`, sameAs: [LINKS.github, LINKS.linkedin], alumniOf: { "@type": "CollegeOrUniversity", name: "BRAC University" }, knowsAbout: ["FastAPI", "Flutter", "LLM integration", "RAG", "React", "Supabase"], subjectOf: projects.map((project) => ({ "@type": "CreativeWork", name: project.name, description: project.summary, ...(project.github ? { url: project.github } : {}) })) }) }} />
     </>
   );
 }
