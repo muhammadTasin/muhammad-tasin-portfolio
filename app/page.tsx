@@ -2,6 +2,8 @@
 
 /* eslint-disable @next/next/no-img-element */
 import { FormEvent, useEffect, useState, useMemo } from "react";
+import { EngineeringEvidence } from "@/components/engineering-evidence";
+import { useEngineeringEvidence } from "@/lib/use-engineering-evidence";
 import PillNav from "@/components/ui/pill-nav";
 import BubbleMenu from "@/components/ui/bubble-menu";
 import { PortfolioSearch, SearchItem } from "@/components/ui/portfolio-search";
@@ -178,39 +180,6 @@ const expertise = [
 
 const keywords = ["Backend", "Applied AI", "Flutter", "Product systems"];
 
-const BACKEND_CI_STATS_URL =
-  "https://nsiyjrhplawzooopgtox.supabase.co/functions/v1/backend-ci-stats";
-
-type BackendCiStats = {
-  backendRepositoryCount: number;
-
-  github: {
-    year: number;
-    authoredCommits: number;
-    longestContributionStreak?: number;
-    activeContributionDays?: number;
-  };
-
-  tests?: {
-    passed: number;
-    failed: number;
-    skipped: number;
-    total: number;
-    reportingRepositoryCount: number;
-    allLatestSuitesPassing: boolean;
-  };
-
-  summary: {
-    successRate: number | null;
-  };
-
-  repositories: Array<{
-    ci: {
-      available: boolean;
-    };
-  }>;
-};
-
 function ArrowIcon() { return <span className="arrow-icon" aria-hidden="true">↗</span>; }
 
 export default function Home() {
@@ -223,8 +192,8 @@ export default function Home() {
   const [activeSection, setActiveSection] = useState("top");
   const [emailCopied, setEmailCopied] = useState(false);
   const [keywordIndex, setKeywordIndex] = useState(0);
-  const [backendCi, setBackendCi] =
-    useState<BackendCiStats | null>(null);
+  const evidence = useEngineeringEvidence();
+  const backendCi = evidence.data;
 
   const navItems = useMemo(() => [
     { label: "Work", href: "#work" },
@@ -306,99 +275,6 @@ export default function Home() {
     window.addEventListener("resize", handleResize, { passive: true });
 
     return () => { window.clearInterval(clock); if (keyword) window.clearInterval(keyword); observer?.disconnect(); sectionObserver.disconnect(); window.removeEventListener("resize", handleResize); };
-  }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function loadBackendCi() {
-      try {
-        const response = await fetch(
-          `${BACKEND_CI_STATS_URL}?t=${Date.now()}`,
-          {
-            cache: "no-store",
-          },
-        );
-
-        if (!response.ok) {
-          throw new Error(
-            `Backend CI request failed: ${response.status}`,
-          );
-        }
-
-        const data =
-          (await response.json()) as BackendCiStats;
-
-        if (!cancelled) {
-          setBackendCi(data);
-        }
-      } catch (error) {
-        console.error(
-          "Unable to load live backend CI statistics:",
-          error,
-        );
-      }
-    }
-
-    void loadBackendCi();
-
-    const DHAKA_OFFSET_MS =
-      6 * 60 * 60 * 1000;
-
-    function millisecondsUntilNextDailyRefresh() {
-      const dhakaNow = new Date(
-        Date.now() + DHAKA_OFFSET_MS,
-      );
-
-      const nextRefresh = new Date(dhakaNow);
-
-      // Refresh at 12:10 AM Bangladesh time,
-      // allowing the midnight workflow to finish.
-      nextRefresh.setUTCHours(0, 10, 0, 0);
-
-      if (nextRefresh <= dhakaNow) {
-        nextRefresh.setUTCDate(
-          nextRefresh.getUTCDate() + 1,
-        );
-      }
-
-      return (
-        nextRefresh.getTime() -
-        dhakaNow.getTime()
-      );
-    }
-
-    let dailyRefreshInterval:
-      number | undefined;
-
-    const dailyRefreshTimer = window.setTimeout(
-      () => {
-        void loadBackendCi();
-
-        dailyRefreshInterval =
-          window.setInterval(
-            () => void loadBackendCi(),
-            24 * 60 * 60 * 1000,
-          );
-      },
-      millisecondsUntilNextDailyRefresh(),
-    );
-
-    return () => {
-      cancelled = true;
-
-      window.clearTimeout(
-        dailyRefreshTimer,
-      );
-
-      if (
-        dailyRefreshInterval !== undefined
-      ) {
-        window.clearInterval(
-          dailyRefreshInterval,
-        );
-      }
-    };
   }, []);
 
   useEffect(() => {
@@ -532,7 +408,7 @@ export default function Home() {
               <span>
                 {backendCi
                   ? `Authored commits · ${backendCi.github.year}`
-                  : "Loading GitHub activity"}
+                  : evidence.status === "error" ? "GitHub activity unavailable" : "Loading GitHub activity"}
               </span>
             </div>
 
@@ -552,174 +428,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section
-          className="engineering-proof-section"
-          aria-labelledby="engineering-proof-title"
-        >
-          <div className="container">
-            <div
-              className="engineering-proof-heading"
-              data-reveal
-            >
-              <div>
-                <span className="eyebrow">
-                  Live engineering evidence
-                </span>
-
-                <h2 id="engineering-proof-title">
-                  Measured work.
-                  <br />
-                  <em>Not just claims.</em>
-                </h2>
-              </div>
-
-              <p>
-                Live signals collected from my GitHub repositories,
-                automated test pipelines and contribution activity.
-                Repositories without verified test reports are never
-                counted as passing.
-              </p>
-            </div>
-
-            <div
-              className="engineering-proof-grid"
-              data-reveal
-            >
-              <article className="engineering-proof-card">
-                <div className="engineering-proof-card-top">
-                  <span className="engineering-proof-label">
-                    Automated tests
-                  </span>
-
-                  <span
-                    className={`engineering-proof-status ${
-                      backendCi?.tests
-                        ?.allLatestSuitesPassing
-                        ? "is-passing"
-                        : ""
-                    }`}
-                  >
-                    <i aria-hidden="true" />
-
-                    {backendCi?.tests
-                      ? backendCi.tests
-                          .allLatestSuitesPassing
-                        ? "Passing"
-                        : "Review"
-                      : "Collecting"}
-                  </span>
-                </div>
-
-                <strong className="engineering-proof-value">
-                  {backendCi?.tests &&
-                  backendCi.tests
-                    .reportingRepositoryCount > 0
-                    ? backendCi.tests.passed
-                        .toLocaleString()
-                    : "—"}
-                </strong>
-
-                <p>
-                  {backendCi?.tests &&
-                  backendCi.tests
-                    .reportingRepositoryCount > 0
-                    ? "Tests passing in latest suites"
-                    : "Awaiting the first verified test scan"}
-                </p>
-              </article>
-
-              <article className="engineering-proof-card">
-                <div className="engineering-proof-card-top">
-                  <span className="engineering-proof-label">
-                    Test coverage
-                  </span>
-
-                  <span className="engineering-proof-index">
-                    02
-                  </span>
-                </div>
-
-                <strong className="engineering-proof-value">
-                  {backendCi?.tests &&
-                  backendCi.tests
-                    .reportingRepositoryCount > 0
-                    ? String(
-                        backendCi.tests
-                          .reportingRepositoryCount,
-                      ).padStart(2, "0")
-                    : "—"}
-                </strong>
-
-                <p>
-                  Repositories publishing verified test
-                  reports
-                </p>
-              </article>
-
-              <article className="engineering-proof-card">
-                <div className="engineering-proof-card-top">
-                  <span className="engineering-proof-label">
-                    Consistency
-                  </span>
-
-                  <span className="engineering-proof-index">
-                    03
-                  </span>
-                </div>
-
-                <strong className="engineering-proof-value">
-                  {typeof backendCi?.github
-                    .longestContributionStreak === "number"
-                    ? `${
-                        backendCi.github
-                          .longestContributionStreak
-                      }d`
-                    : "—"}
-                </strong>
-
-                <p>
-                  Longest contribution streak in{" "}
-                  {backendCi?.github.year ?? "2026"}
-                </p>
-              </article>
-
-              <article className="engineering-proof-card">
-                <div className="engineering-proof-card-top">
-                  <span className="engineering-proof-label">
-                    Active days
-                  </span>
-
-                  <span className="engineering-proof-index">
-                    04
-                  </span>
-                </div>
-
-                <strong className="engineering-proof-value">
-                  {typeof backendCi?.github
-                    .activeContributionDays === "number"
-                    ? backendCi.github
-                        .activeContributionDays
-                        .toLocaleString()
-                    : "—"}
-                </strong>
-
-                <p>
-                  Contribution days recorded in{" "}
-                  {backendCi?.github.year ?? "2026"}
-                </p>
-              </article>
-            </div>
-
-            <p
-              className="engineering-proof-note"
-              data-reveal
-            >
-              Daily snapshot · Refreshes nightly after
-              12:00 AM Bangladesh time. Missing evidence is
-              shown as unavailable, never estimated.
-            </p>
-          </div>
-        </section>
+        <EngineeringEvidence state={evidence} />
 
         <section className="section work-section" id="work">
           <div className="container">

@@ -104,6 +104,7 @@ export async function loadContributionSnapshot(
     "https://api.github.com/graphql",
     {
       method: "POST",
+      signal: AbortSignal.timeout(15_000),
       headers: {
         Accept: "application/vnd.github+json",
         Authorization: `Bearer ${token}`,

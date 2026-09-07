@@ -332,3 +332,16 @@ jobs:
           path: backend-test-summary.json
           retention-days: 90
           if-no-files-found: error
+
+      - name: Publish verified portfolio snapshot
+        env:
+          EVIDENCE_REFRESH_SECRET: ${{ secrets.EVIDENCE_REFRESH_SECRET }}
+        run: |
+          test -n "$EVIDENCE_REFRESH_SECRET" || { echo "EVIDENCE_REFRESH_SECRET is required"; exit 1; }
+          curl --fail-with-body --silent --show-error \
+            --max-time 150 --retry 2 --retry-delay 10 \
+            --request POST \
+            --header "Content-Type: application/json" \
+            --header "x-evidence-refresh-secret: $EVIDENCE_REFRESH_SECRET" \
+            --data-binary @backend-test-summary.json \
+            https://nsiyjrhplawzooopgtox.supabase.co/functions/v1/backend-ci-stats
