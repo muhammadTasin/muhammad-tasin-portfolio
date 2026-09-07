@@ -39,7 +39,7 @@ try {
       const before = await measure();
       assert.ok(before.every(card => Math.abs(card.height - (width > 560 ? 220 : 190)) < 2), "original card heights");
       assert.ok(before.every(card => !card.overflow), `loading overflow ${width} ${theme}`);
-      assert.equal(await page.locator(".evidence-skeleton").first().evaluate(el => getComputedStyle(el).animationName), "none");
+      assert.equal(await page.locator(".number-loading-tracks i").first().evaluate(el => getComputedStyle(el).animationName), "none");
       await section.screenshot({ path: `${output}/${width}-${theme}-loading.png` });
       release();
       await page.waitForFunction(() => document.querySelectorAll(".evidence-value.is-ready").length === 4);
@@ -87,7 +87,7 @@ try {
   await page.route("**/functions/v1/backend-ci-stats*", () => {});
   await page.goto(process.env.EVIDENCE_PREVIEW_URL || "http://localhost:5173/");
   await page.locator(".engineering-proof-section").scrollIntoViewIfNeeded();
-  assert.equal(await page.locator(".evidence-skeleton").first().evaluate(el => getComputedStyle(el).animationName), "evidence-scan");
+  assert.equal(await page.locator(".number-loading-tracks i").first().evaluate(el => getComputedStyle(el).animationName), "evidence-reel");
   assert.equal(await page.locator(".engineering-proof-status i").evaluate(el => getComputedStyle(el).animationName), "evidence-pulse");
   await context.close();
   await writeFile(`${output}/results.json`, JSON.stringify(results, null, 2));

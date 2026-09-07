@@ -25,10 +25,11 @@ The existing page remains a client component because navigation, theme, modals, 
 ## UI and lifecycle
 
 - Four original cards, responsive 4/2/1-column layout, original typography, themes, borders, accents and hover styling.
-- Number-sized scanning skeleton, softly pulsing collecting dot, and clear retrieval text.
-- 240 ms opacity crossfade; no count-up or new animation dependency.
+- Distinct three-track loading reels without numeric measurements, a softly pulsing collecting dot, and clear retrieval text.
+- Once a verified target is known, an eased requestAnimationFrame count-up enters vertically from above and settles in 140–400 ms. One-unit changes take 140 ms; unchanged values do not animate. New targets continue from the current presentation value, canceling the previous frame loop. No animation dependency or network delay was added.
+- The exact target remains available to assistive technology immediately; intermediate values are an aria-hidden presentation layer. Reduced-motion shows the exact target immediately, including when the preference changes mid-animation. Suffixes, grouping, padded repository counts and true zeros are preserved. The same counter is used for authored commits and repository counts in the hero.
 - Fixed value and two-line caption slots retain the original 220 px desktop/tablet and 190 px mobile card minimums.
-- Reduced-motion disables skeleton, dot and value animation/transition. An accessible live status announces completion/error and timestamps.
+- Reduced-motion disables loading reels, dot and value animation/transition. An accessible live status announces completion/error and timestamps.
 - Explicit `loading`, `success`, `stale-success`, `error` states. A 12-second request deadline prevents an infinite skeleton.
 - One in-flight request is shared through Strict Mode reattachment and rerenders. Actual unmount aborts pending work and clears timers. Scrolling does not fetch.
 - First daily read remains 00:10 Bangladesh time. If the midnight scan has not finished, retry every five minutes until a newer snapshot arrives. Failures also retry every five minutes while subscribed. Fresh remounts reuse memory for five minutes; one shared timer controls refreshes.
@@ -63,9 +64,9 @@ Final local verification results:
 - `npm run lint`: exit 0; 0 errors, 11 pre-existing warnings.
 - `npx tsc --noEmit`: exit 0.
 - `npm run build`: exit 0; ESM Worker and hosting artifact validation passed.
-- `npm test`: exit 0; 17/17 tests passed, including the original rendered-HTML check.
+- `npm test`: exit 0; 21/21 tests passed, including the original rendered-HTML check.
 - Deno Edge Function type check: exit 0 (existing dependency install-script warnings only).
-- Browser QA: 14 responsive state/theme scenarios passed, plus normal/reduced-motion checks. No card geometry changes or overflow in the tested transitions.
+- Browser QA: 14 responsive state/theme scenarios passed, plus normal/reduced-motion checks and the dedicated rolling-counter browser suite (refresh, retargeting, formatting, exact accessible values, unmount and rerender behavior). No card geometry changes or overflow in the tested transitions.
 - `git diff --check`: passed.
 
 Verification commands:
@@ -88,6 +89,9 @@ npm run dev -- --host 0.0.0.0
 PLAYWRIGHT_MODULE=/absolute/path/to/playwright/index.mjs \
 CHROME_EXECUTABLE=/usr/bin/google-chrome \
 node tests/evidence-browser.mjs
+
+# With the same Playwright/Chrome environment, exercise rolling-number behavior:
+node tests/number-roll-browser.mjs
 ```
 
 The browser runner uses clearly controlled test fixtures, never writes them to production, and saves screenshots/results under `/tmp/evidence-qa` by default. It checks dark/light loading-to-success at 1440, 768, 390 and 320 px, one request, zero card geometry changes, no card overflow, and original card heights. Error/stale transitions are checked at 1440, 768 and 390 px. Reduced and regular motion are checked separately.
@@ -112,7 +116,7 @@ No Supabase schema changes, secret writes, function deployment, GitHub workflow 
 
 ## Changed files
 
-- `app/page.tsx`, `components/engineering-evidence.tsx`, `app/globals.css`: shared data integration and evidence UI.
+- `app/page.tsx`, `components/engineering-evidence.tsx`, `components/rolling-number.tsx`, `lib/number-roll.ts`, `app/globals.css`: shared data integration and evidence UI.
 - `lib/evidence-store.ts`, `lib/use-engineering-evidence.ts`: explicit states, validation, coalescing, cancellation and scheduling.
 - `supabase/functions/_shared/evidence.ts`: common public schema and freshness policy.
 - `supabase/functions/backend-ci-stats/index.ts`, `handler.ts`, `storage.ts`, `aggregate.ts`: public snapshot reader and privileged publisher.
@@ -120,4 +124,5 @@ No Supabase schema changes, secret writes, function deployment, GitHub workflow 
 - `supabase/migrations/20260907000000_engineering_evidence_snapshot.sql`: durable protected snapshot and guarded publisher.
 - `.github/workflows/scalable-backend-test-scan.yml`: publish after the existing aggregate artifact upload.
 - `tests/evidence.test.mjs`, `tests/evidence-storage.test.mjs`, `tests/evidence-browser.mjs`, `tests/register-typescript.mjs`, `tests/typescript-loader.mjs`, `package.json`: new coverage without removing existing verification.
+- `tests/number-roll.test.mjs`, `tests/number-roll-browser.mjs`, `tests/fixtures/number-roll.html`, `tests/fixtures/number-roll.tsx`: rolling animation math, formatting and development-only interactive browser fixture.
 - `ENGINEERING_EVIDENCE.md`: diagnosis, measurements and rollout instructions.

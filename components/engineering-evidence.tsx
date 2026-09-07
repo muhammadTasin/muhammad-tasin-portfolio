@@ -1,4 +1,5 @@
 "use client";
+import { RollingNumber } from "./rolling-number";
 import type { EvidenceState } from "../lib/evidence-store";
 
 export function EngineeringEvidence({ state }: { state: EvidenceState }) {
@@ -10,13 +11,13 @@ export function EngineeringEvidence({ state }: { state: EvidenceState }) {
     timeZone: "Asia/Dhaka", day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit",
   }).format(new Date(data.generatedAt)) + " BDT" : "";
   const cards = [
-    { label: "Automated tests", value: tests && tests.reportingRepositoryCount > 0 ? tests.passed.toLocaleString("en-US") : null,
+    { label: "Automated tests", value: tests && tests.reportingRepositoryCount > 0 ? tests.passed : null,
       loadingText: "Loading verified test evidence", description: tests?.reportingRepositoryCount ? "Tests passing in latest suites" : "No verified test reports available" },
-    { label: "Test coverage", value: tests ? String(tests.reportingRepositoryCount).padStart(2, "0") : null,
+    { label: "Test coverage", value: tests ? tests.reportingRepositoryCount : null,
       loadingText: "Loading verified test reports", description: "Repositories publishing verified test reports" },
-    { label: "Consistency", value: data ? `${data.github.longestContributionStreak}d` : null,
+    { label: "Consistency", value: data ? data.github.longestContributionStreak : null,
       loadingText: "Loading contribution history", description: `Longest contribution streak in ${year ?? "this year"}` },
-    { label: "Active days", value: data ? data.github.activeContributionDays.toLocaleString("en-US") : null,
+    { label: "Active days", value: data ? data.github.activeContributionDays : null,
       loadingText: "Loading contribution activity", description: `Contribution days recorded in ${year ?? "this year"}` },
   ];
   return (
@@ -62,9 +63,8 @@ export function EngineeringEvidence({ state }: { state: EvidenceState }) {
                     ) : <span className="engineering-proof-index">0{index + 1}</span>}
                   </div>
                   <strong className={`engineering-proof-value evidence-value ${loading ? "is-loading" : "is-ready"}`}>
-                    <span className="evidence-skeleton" aria-hidden="true" />
-                    <span className={`evidence-number ${card.value === null ? "is-unavailable" : ""}`}>
-                      {loading ? <span className="evidence-sr-only">Loading</span> : card.value ?? "Unavailable"}
+                    <span className="evidence-number">
+                      <RollingNumber value={card.value} loading={loading} minimumDigits={index === 1 ? 2 : 1} suffix={index === 2 ? "d" : ""} />
                     </span>
                   </strong>
                   <p>{loading ? card.loadingText : state.status === "error" ? "Live evidence could not be refreshed" : card.description}</p>

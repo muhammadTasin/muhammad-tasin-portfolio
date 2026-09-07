@@ -2,6 +2,7 @@
 
 /* eslint-disable @next/next/no-img-element */
 import { FormEvent, useEffect, useState, useMemo } from "react";
+import { RollingNumber } from "@/components/rolling-number";
 import { EngineeringEvidence } from "@/components/engineering-evidence";
 import { useEngineeringEvidence } from "@/lib/use-engineering-evidence";
 import PillNav from "@/components/ui/pill-nav";
@@ -399,10 +400,8 @@ export default function Home() {
             </div>
 
             <div>
-              <strong>
-                {backendCi
-                  ? backendCi.github.authoredCommits.toLocaleString()
-                  : "—"}
+              <strong className="signal-metric">
+                <RollingNumber value={backendCi?.github.authoredCommits ?? null} loading={evidence.status === "loading"} />
               </strong>
 
               <span>
@@ -413,12 +412,8 @@ export default function Home() {
             </div>
 
             <div>
-              <strong>
-                {backendCi
-                  ? String(
-                      backendCi.backendRepositoryCount,
-                    ).padStart(2, "0")
-                  : "—"}
+              <strong className="signal-metric">
+                <RollingNumber value={backendCi?.backendRepositoryCount ?? null} loading={evidence.status === "loading"} minimumDigits={2} />
               </strong>
 
               <span>
