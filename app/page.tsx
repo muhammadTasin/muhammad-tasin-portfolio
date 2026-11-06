@@ -172,6 +172,11 @@ const repositories = [
   { name: "Falah", language: "TypeScript", description: "Private per-user ibadah tracking with prayer times, Firebase and optional AI reflections.", url: "https://github.com/muhammadTasin/falah-web" },
 ];
 
+const clients = [
+  { name: "Elite Group", sector: "Industrial group · Bangladesh", url: "https://elitegroup-bd.com", logo: "/clients/elite-group.webp", width: 156, height: 184, logoHeight: 104 },
+  { name: "Aqua Paints", sector: "Paints & coatings · Bangladesh", url: "https://www.aquapaints.com", logo: "/clients/aqua-paints.webp", width: 164, height: 63, logoHeight: 64 },
+];
+
 const expertise = [
   { index: "01", title: "Backend & APIs", description: "Secure, testable services that keep business logic and sensitive actions on the server.", skills: ["FastAPI", "REST APIs", "Python", "JWT", "PostgreSQL", "Supabase"] },
   { index: "02", title: "Applied AI", description: "LLM features grounded in product context, structured output and resilient fallback workflows.", skills: ["LLM integration", "RAG", "Gemini", "Prompt systems", "Embeddings", "AI evaluation"] },
@@ -215,6 +220,7 @@ export default function Home() {
     repositories.forEach(r => {
       items.push({ id: `repo-${r.name}`, title: r.name, subtitle: r.description, type: "Repository", href: r.url });
     });
+    items.push({ id: "nav-clients", title: "Our clients", subtitle: clients.map((c) => c.name).join(" · "), type: "Section", href: "#clients" });
     items.push({ id: "nav-about", title: "About", type: "Section", href: "#about" });
     items.push({ id: "nav-contact", title: "Contact", type: "Section", href: "#contact" });
     items.push({ id: "nav-github", title: "GitHub", subtitle: "View my GitHub profile", type: "Link", href: LINKS.github });
@@ -501,6 +507,20 @@ export default function Home() {
                   </div>
                 );
               })}
+            </div>
+          </div>
+        </section>
+
+        <section className="section clients-section" id="clients">
+          <div className="container">
+            <div className="section-heading compact" data-reveal><div><span className="eyebrow">Client work</span><h2>Our <em>clients.</em></h2></div><p>Companies I have built and shipped software for.</p></div>
+            <div className="client-grid">
+              {clients.map((client) => (
+                <a className="client-card cursor-target" key={client.name} href={client.url} target="_blank" rel="noopener noreferrer" aria-label={`Visit the ${client.name} website in a new tab`} data-reveal>
+                  <div className="client-logo"><img src={client.logo} width={client.width} height={client.height} style={{ height: client.logoHeight }} alt={`${client.name} logo`} loading="lazy" /></div>
+                  <div className="client-info"><div><h3>{client.name}</h3><p>{client.sector}</p></div><ArrowIcon /></div>
+                </a>
+              ))}
             </div>
           </div>
         </section>
