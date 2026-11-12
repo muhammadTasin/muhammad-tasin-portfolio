@@ -22,7 +22,7 @@ try {
       let calls = 0;
       let onRequest;
       const started = new Promise(resolve => { onRequest = resolve; });
-      await page.route("**/functions/v1/backend-ci-stats*", async route => {
+      await page.route("**/evidence-data/evidence.json*", async route => {
         calls++; onRequest(); await gate;
         await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(snapshot()) });
       });
@@ -62,7 +62,7 @@ try {
       const page = await context.newPage();
       let release;
       const gate = new Promise(resolve => { release = resolve; });
-      await page.route("**/functions/v1/backend-ci-stats*", async route => {
+      await page.route("**/evidence-data/evidence.json*", async route => {
         await gate;
         await route.fulfill({ status: mode === "error" ? 503 : 200, contentType: "application/json", body: JSON.stringify(snapshot(true)) });
       });
@@ -84,7 +84,7 @@ try {
   // Verify the animated mode separately from deterministic reduced-motion QA.
   const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, reducedMotion: "no-preference" });
   const page = await context.newPage();
-  await page.route("**/functions/v1/backend-ci-stats*", () => {});
+  await page.route("**/evidence-data/evidence.json*", () => {});
   await page.goto(process.env.EVIDENCE_PREVIEW_URL || "http://localhost:5173/");
   await page.locator(".engineering-proof-section").scrollIntoViewIfNeeded();
   assert.equal(await page.locator(".number-loading-tracks i").first().evaluate(el => getComputedStyle(el).animationName), "evidence-reel");

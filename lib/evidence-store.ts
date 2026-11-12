@@ -1,11 +1,22 @@
 import { isEvidenceSnapshot, snapshotAgeState, type EvidenceSnapshot } from "../supabase/functions/_shared/evidence";
 
-export const EVIDENCE_URL = "https://nsiyjrhplawzooopgtox.supabase.co/functions/v1/backend-ci-stats";
+// Published nightly by .github/workflows/scalable-backend-test-scan.yml.
+export const EVIDENCE_URL =
+  "https://raw.githubusercontent.com/muhammadTasin/muhammad-tasin-portfolio/evidence-data/evidence.json";
 export type EvidenceState =
   | { status: "loading" | "error"; data: null }
   | { status: "success" | "stale-success"; data: EvidenceSnapshot };
 export const INITIAL_EVIDENCE: EvidenceState = { status: "loading", data: null };
 const RETRY_MS = 5 * 60 * 1000;
+
+// An old snapshot stays on screen, dated and marked as delayed, so a broken
+// refresh shows the last verified result instead of nothing. Only snapshots
+// dated in the future are rejected.
+function displayStatus(data: EvidenceSnapshot, at: number) {
+  const age = snapshotAgeState(data, at);
+  if (age !== "expired") return age;
+  return Date.parse(data.generatedAt) > at ? null : "stale-success";
+}
 
 // Midnight workflow, with an initial read at 00:10 Bangladesh time.
 export function nextDailyRefresh(now: number) {
@@ -25,8 +36,6 @@ export function createEvidenceStore(fetcher: typeof fetch = fetch, now = Date.no
   let teardown: ReturnType<typeof setTimeout> | undefined;
   const listeners = new Set<() => void>();
   const emit = (value: EvidenceState) => { state = value; listeners.forEach(fn => fn()); };
-  const retained = (): EvidenceSnapshot | null =>
-    state.data && snapshotAgeState(state.data, now()) !== "expired" ? state.data : null;
 
   function schedule() {
     clearTimeout(timer);
@@ -50,9 +59,9 @@ export function createEvidenceStore(fetcher: typeof fetch = fetch, now = Date.no
         if (!response.ok) throw new Error("Evidence unavailable");
         const data: unknown = await response.json();
         if (!isEvidenceSnapshot(data)) throw new Error("Invalid evidence");
-        const status = snapshotAgeState(data, now());
-        if (status === "expired") throw new Error("Expired evidence");
-        const previous = retained();
+        const status = displayStatus(data, now());
+        if (!status) throw new Error("Future-dated evidence");
+        const previous = state.data;
         if (!current.signal.aborted) {
           // A lagging cache must not roll back a newer verified snapshot.
           emit(previous && Date.parse(previous.generatedAt) > Date.parse(data.generatedAt)
@@ -62,7 +71,7 @@ export function createEvidenceStore(fetcher: typeof fetch = fetch, now = Date.no
         // Unmount cancellation has no subscribers to update. A timeout or
         // network failure while mounted always exits the loading state.
         if (listeners.size) {
-          const data = retained();
+          const data = state.data;
           emit(data ? { status: "stale-success", data } : { status: "error", data: null });
         }
       } finally {
@@ -81,7 +90,6 @@ export function createEvidenceStore(fetcher: typeof fetch = fetch, now = Date.no
     subscribe(listener: () => void) {
       clearTimeout(teardown);
       listeners.add(listener);
-      if (state.data && !retained()) emit({ status: "loading", data: null });
       if (!flight && (state.status === "loading" || now() - lastAttempt >= RETRY_MS)) void refresh();
       else schedule();
       return () => {
