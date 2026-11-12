@@ -199,6 +199,10 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    # Needed only to push the evidence-data branch.
+    permissions:
+      contents: write
+
     steps:
       - name: Download repository results
         if: needs.discover.outputs.count != '0'
@@ -333,15 +337,46 @@ jobs:
           retention-days: 90
           if-no-files-found: error
 
+      - name: Checkout controller repository
+        uses: actions/checkout@v4
+        with:
+          path: controller
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      # Validates the summary and adds GitHub contribution stats. Only the
+      # public projection (counts, no repository names) is written out.
+      - name: Build public evidence snapshot
+        env:
+          GITHUB_TOKEN: ${{ secrets.BACKEND_REPOS_TOKEN }}
+          GITHUB_OWNER: muhammadTasin
+        run: |
+          node controller/scripts/backend-stats/build-snapshot.mjs \
+            backend-test-summary.json \
+            evidence.json
+
+      # The portfolio reads evidence.json from the evidence-data branch via
+      # raw.githubusercontent.com. The branch is force-pushed as a single
+      # commit so it never accumulates history. If any earlier step fails,
+      # nothing is pushed and the previous snapshot stays published.
       - name: Publish verified portfolio snapshot
         env:
-          EVIDENCE_REFRESH_SECRET: ${{ secrets.EVIDENCE_REFRESH_SECRET }}
+          GH_TOKEN: ${{ github.token }}
         run: |
-          test -n "$EVIDENCE_REFRESH_SECRET" || { echo "EVIDENCE_REFRESH_SECRET is required"; exit 1; }
-          curl --fail-with-body --silent --show-error \
-            --max-time 150 --retry 2 --retry-delay 10 \
-            --request POST \
-            --header "Content-Type: application/json" \
-            --header "x-evidence-refresh-secret: $EVIDENCE_REFRESH_SECRET" \
-            --data-binary @backend-test-summary.json \
-            https://nsiyjrhplawzooopgtox.supabase.co/functions/v1/backend-ci-stats
+          mkdir publish
+          cp evidence.json publish/evidence.json
+          # Data-only branch: stop Vercel from trying to build it.
+          printf '{\n  "git": { "deploymentEnabled": false }\n}\n' > publish/vercel.json
+          cd publish
+          git init --quiet --initial-branch=evidence-data
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add evidence.json vercel.json
+          git commit --quiet --message "Update engineering evidence snapshot"
+          git push --force --quiet \
+            "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" \
+            HEAD:refs/heads/evidence-data

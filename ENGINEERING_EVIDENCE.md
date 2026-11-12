@@ -1,5 +1,17 @@
 # Engineering Evidence: implementation and rollout
 
+## Update, 12 November 2026: snapshot now hosted on GitHub
+
+The Supabase project `nsiyjrhplawzooopgtox` was paused, so its hostname stopped resolving. The nightly workflow's publish step failed from 6 November, and the site showed "Unavailable". The snapshot no longer depends on Supabase:
+
+- The `aggregate` job runs `scripts/backend-stats/build-snapshot.mjs`, which calls the unchanged `supabase/functions/backend-ci-stats/aggregate.ts` under Node (with a `Deno.env` shim). Validation and the public-only projection are the same as before. It uses the `BACKEND_REPOS_TOKEN` secret for GitHub API calls.
+- The job force-pushes `evidence.json` as a single commit to the `evidence-data` branch, together with a `vercel.json` that disables Vercel builds for that branch. If any step fails, nothing is pushed and the previous snapshot stays published.
+- The site reads `https://raw.githubusercontent.com/muhammadTasin/muhammad-tasin-portfolio/evidence-data/evidence.json`.
+- A snapshot older than the 7-day window is no longer hidden. It stays on screen as "Last verified snapshot · Refresh delayed" with its date. Only future-dated snapshots are rejected.
+- `EVIDENCE_REFRESH_SECRET` and the Edge Function are no longer used. The Supabase sections below are kept as history.
+
+## Original implementation (7 September 2026)
+
 Implemented and verified locally on 7 September 2026. The Vercel production website and Supabase endpoint have **not** been updated by this change. A frontend deployment alone does not activate the faster data pipeline.
 
 ## Diagnosis and architecture

@@ -77,7 +77,7 @@ test("one shared request across subscribers, Strict Mode reattach and rerenders"
   unsub4(); await flush();
 });
 
-test("network failure exits loading, retains good data on refresh, expires old data", async () => {
+test("network failure exits loading and keeps the last verified snapshot at any age", async () => {
   let fail = true, clock = now;
   const store = createEvidenceStore(async () => {
     if (fail) throw new Error("offline");
@@ -91,6 +91,27 @@ test("network failure exits loading, retains good data on refresh, expires old d
   assert.equal(store.getSnapshot().status, "stale-success");
   assert.equal(store.getSnapshot().data.tests.passed, 0);
   clock += MAX_AGE_MS + 1; await store.refresh();
+  assert.equal(store.getSnapshot().status, "stale-success");
+  assert.equal(store.getSnapshot().data.generatedAt, fixture().generatedAt);
+  unsub(); await flush();
+});
+
+test("a published snapshot older than a week is shown as delayed, not unavailable", async () => {
+  const old = fixture(MAX_AGE_MS + 3600_000);
+  const store = createEvidenceStore(async () => Response.json(old), () => now);
+  const unsub = store.subscribe(() => {});
+  await store.refresh();
+  const state = store.getSnapshot();
+  assert.equal(state.status, "stale-success");
+  assert.equal(state.data.generatedAt, old.generatedAt);
+  assert.match(render(state), /Last verified snapshot.*Refresh delayed/);
+  unsub(); await flush();
+});
+
+test("future-dated snapshots are rejected", async () => {
+  const store = createEvidenceStore(async () => Response.json(fixture(-3600_000)), () => now);
+  const unsub = store.subscribe(() => {});
+  await store.refresh();
   assert.equal(store.getSnapshot().status, "error");
   unsub(); await flush();
 });
