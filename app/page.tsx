@@ -15,18 +15,13 @@ import GradualBlur from "@/components/ui/gradual-blur";
 import Strands from "@/components/ui/strands";
 
 const LINKS = {
-  github: "https://github.com/muhammadTasin",
   linkedin: "https://www.linkedin.com/in/md-tasfiq-tasin-701634359/",
   email: "muhammadtasin18@gmail.com",
   resumePdf: "/Md_Tasfiq_Tasin_ATS_Master_CV.pdf",
   resumeDocx: "/Md_Tasfiq_Tasin_ATS_Master_CV.docx",
-  desiDigest: "https://github.com/muhammadTasin/Desi-Digest-The-Infinity-AI-BuildFest-2026-",
   desiDigestLive: "https://project-rae6k.vercel.app/",
-  courseVault: "https://github.com/muhammadTasin/Bracu-coursevault-ai",
   courseVaultLive: "https://bracu-coursevault-ai.vercel.app",
-  latexStudio: "https://github.com/muhammadTasin/Latex-Converter",
   latexStudioLive: "https://latex-converter-coral.vercel.app",
-  salesBondhu: "https://github.com/muhammadTasin/SalesBondhu-AI",
 };
 
 // NAV_ITEMS is dynamically defined inside the component to support local event handlers.
@@ -60,7 +55,6 @@ type Project = {
   features: string[];
   stack: string[];
   architecture: string[];
-  github?: string;
   live?: string;
 };
 
@@ -87,7 +81,6 @@ const projects: Project[] = [
     features: ["GPS visit verification", "Manager flag review", "Supabase-backed daily plan", "Natural Bangla AI coach", "Backend-driven actions"],
     stack: ["Flutter", "FastAPI", "Python", "Supabase", "PostgreSQL", "JWT", "REST APIs", "LLM integration"],
     architecture: ["Flutter app", "FastAPI API", "Supabase", "AI coach"],
-    github: LINKS.salesBondhu,
   },
   {
     id: "desidigest",
@@ -111,7 +104,6 @@ const projects: Project[] = [
     features: ["Photo plate analysis", "Banglish meal parser", "Personalized health nudges", "Nanumoni AI companion", "Nutrition dashboard"],
     stack: ["TanStack Start", "React", "TypeScript", "Gemini", "Supabase", "Zod", "Vite", "Nitro"],
     architecture: ["Meal input", "AI analysis", "Nutrition context", "Safe guidance"],
-    github: LINKS.desiDigest,
     live: LINKS.desiDigestLive,
   },
   {
@@ -136,7 +128,6 @@ const projects: Project[] = [
     features: ["Course/resource CRUD", "Supabase authentication", "PostgreSQL RLS", "Secure route guards", "Three.js shader visuals"],
     stack: ["Next.js", "TypeScript", "Supabase", "PostgreSQL", "Three.js", "Zod", "Tailwind CSS"],
     architecture: ["Next.js UI", "Server actions", "Supabase Auth", "Postgres + RLS"],
-    github: LINKS.courseVault,
     live: LINKS.courseVaultLive,
   },
   {
@@ -161,15 +152,14 @@ const projects: Project[] = [
     features: ["Equation and matrix conversion", "Table reconstruction", "Citation handling", "PDF text extraction", "Tesseract OCR"],
     stack: ["Next.js", "TypeScript", "React", "pdf-parse", "Tesseract.js", "Regression tests"],
     architecture: ["Mixed input", "Type detection", "Structure parser", "LaTeX output"],
-    github: LINKS.latexStudio,
     live: LINKS.latexStudioLive,
   },
 ];
 
 const repositories = [
-  { name: "Qasas", language: "TypeScript", description: "Full-stack story publishing with authentication, reactions, comments and read-time analytics.", url: "https://github.com/muhammadTasin/Qasas-" },
-  { name: "Aircraft Maintenance Tracker v2", language: "JavaScript", description: "Role-aware fleet maintenance, defect, task and operational-alert workflows.", url: "https://github.com/muhammadTasin/aircraft-maintenance-tracker-v2-publish-ready" },
-  { name: "Falah", language: "TypeScript", description: "Private per-user ibadah tracking with prayer times, Firebase and optional AI reflections.", url: "https://github.com/muhammadTasin/falah-web" },
+  { name: "Qasas", language: "TypeScript", description: "Full-stack story publishing with authentication, reactions, comments and read-time analytics." },
+  { name: "Aircraft Maintenance Tracker v2", language: "JavaScript", description: "Role-aware fleet maintenance, defect, task and operational-alert workflows." },
+  { name: "Falah", language: "TypeScript", description: "Private per-user ibadah tracking with prayer times, Firebase and optional AI reflections." },
 ];
 
 const clients = [
@@ -218,12 +208,11 @@ export default function Home() {
       items.push({ id: `exp-${e.index}`, title: e.title, subtitle: e.description, type: "Expertise", href: "#expertise", matches: e.skills });
     });
     repositories.forEach(r => {
-      items.push({ id: `repo-${r.name}`, title: r.name, subtitle: r.description, type: "Repository", href: r.url });
+      items.push({ id: `repo-${r.name}`, title: r.name, subtitle: r.description, type: "Repository", href: "#github" });
     });
     items.push({ id: "nav-clients", title: "Our clients", subtitle: clients.map((c) => c.name).join(" · "), type: "Section", href: "#clients" });
     items.push({ id: "nav-about", title: "About", type: "Section", href: "#about" });
     items.push({ id: "nav-contact", title: "Contact", type: "Section", href: "#contact" });
-    items.push({ id: "nav-github", title: "GitHub", subtitle: "View my GitHub profile", type: "Link", href: LINKS.github });
     items.push({ id: "nav-resume-pdf", title: "Resume (PDF)", subtitle: "Download ATS PDF resume", type: "Link", href: LINKS.resumePdf });
     items.push({ id: "nav-resume-docx", title: "Resume (Word)", subtitle: "Download ATS Word resume", type: "Link", href: LINKS.resumeDocx });
     return items;
@@ -339,7 +328,6 @@ export default function Home() {
         />
         <div className="header-actions">
           <div className="header-socials">
-            <a href={LINKS.github} className="cursor-target" target="_blank" rel="noopener noreferrer" aria-label="View GitHub profile in a new tab">GH</a>
             <a href={LINKS.linkedin} className="cursor-target" target="_blank" rel="noopener noreferrer" aria-label="View LinkedIn profile in a new tab">in</a>
           </div>
           <div className="desktop-search-wrap">
@@ -367,7 +355,6 @@ export default function Home() {
               <p className="hero-lede">I build practical AI-powered web and mobile products using secure backend APIs, databases, Flutter and context-aware LLM workflows.</p>
               <div className="hero-actions">
                 <a className="button button-primary magnetic" href="#work">Explore selected work <span aria-hidden="true">↓</span></a>
-                <a className="text-link" href={LINKS.github} target="_blank" rel="noopener noreferrer" aria-label="View GitHub profile in a new tab">GitHub <ArrowIcon /></a>
                 <a className="text-link" href={LINKS.linkedin} target="_blank" rel="noopener noreferrer" aria-label="View LinkedIn profile in a new tab">LinkedIn <ArrowIcon /></a>
               </div>
               <div className="keyword-line" aria-label="Focus areas"><span>Focus</span><strong key={keywords[keywordIndex]}>{keywords[keywordIndex]}</strong></div>
@@ -463,8 +450,7 @@ export default function Home() {
                       <div className="tag-row">{project.stack.slice(0, 6).map((tech) => <span key={tech}>{tech}</span>)}</div>
                       <div className="project-actions">
                         {project.live && <a className="button button-primary cursor-target" href={project.live} target="_blank" rel="noopener noreferrer" aria-label={`Open ${project.name} live product in a new tab`}>Live product <ArrowIcon /></a>}
-                        {project.github && <a className="button button-ghost cursor-target" href={project.github} target="_blank" rel="noopener noreferrer" aria-label={`Open ${project.name} repository on GitHub in a new tab`}>GitHub <ArrowIcon /></a>}
-                        {!project.github && <button className="button button-ghost cursor-target" type="button" onClick={() => setSelectedProject(project)}>Architecture overview <span aria-hidden="true">→</span></button>}
+                        <button className="button button-ghost cursor-target" type="button" onClick={() => setSelectedProject(project)}>Architecture overview <span aria-hidden="true">→</span></button>
                         <button className="case-button cursor-target" type="button" onClick={() => setSelectedProject(project)}>Case study <span aria-hidden="true">→</span></button>
                       </div>
                     </div>
@@ -529,10 +515,10 @@ export default function Home() {
           <div className="container">
             <div className="github-intro" data-reveal>
               <div><span className="eyebrow">Open-source footprint</span><h2>More experiments<br />and <em>builds.</em></h2></div>
-              <div><p>A curated view of public repositories. Flagship projects remain intentionally selected rather than changing with GitHub&apos;s recent-update order.</p><a className="button button-primary" href={LINKS.github} target="_blank" rel="noopener noreferrer" aria-label="Browse all Md. Tasfiq Tasin repositories on GitHub in a new tab">Browse all repositories <ArrowIcon /></a></div>
+              <div><p>A curated view of public repositories. Flagship projects remain intentionally selected rather than changing with GitHub&apos;s recent-update order.</p></div>
             </div>
             <div className="repo-grid">
-              {repositories.map((repo, index) => <a className="repo-card" key={repo.name} href={repo.url} target="_blank" rel="noopener noreferrer" aria-label={`Open ${repo.name} repository in a new tab`} data-reveal><span className="repo-index">0{index + 1}</span><div><span className="repo-language"><i></i>{repo.language}</span><h3>{repo.name}</h3><p>{repo.description}</p></div><ArrowIcon /></a>)}
+              {repositories.map((repo, index) => <article className="repo-card" key={repo.name} data-reveal><span className="repo-index">0{index + 1}</span><div><span className="repo-language"><i></i>{repo.language}</span><h3>{repo.name}</h3><p>{repo.description}</p></div></article>)}
             </div>
           </div>
         </section>
@@ -676,7 +662,6 @@ export default function Home() {
               © 2026 Md. Tasfiq Tasin. Built with Next.js, TypeScript and thoughtful systems.
             </div>
             <div className="socials">
-              <a href={LINKS.github} target="_blank" rel="noopener noreferrer" className="cursor-target">GitHub</a>
               <a href={LINKS.linkedin} target="_blank" rel="noopener noreferrer" className="cursor-target">LinkedIn</a>
               <a href={`mailto:${LINKS.email}`} className="cursor-target">Email</a>
             </div>
@@ -687,7 +672,7 @@ export default function Home() {
         </div>
       </footer>
 
-      {selectedProject && <div className="modal-backdrop" role="presentation" onMouseDown={() => setSelectedProject(null)}><section className="case-modal" role="dialog" aria-modal="true" aria-labelledby="case-title" onMouseDown={(event) => event.stopPropagation()}><button className="modal-close" type="button" onClick={() => setSelectedProject(null)} aria-label="Close case study" autoFocus>×</button><div className="modal-heading"><span className="eyebrow">{selectedProject.type} case study</span><h2 id="case-title">{selectedProject.name}</h2><p>{selectedProject.tagline}</p></div><div className="case-grid"><CaseFact label="Context" text={selectedProject.summary} /><CaseFact label="The problem" text={selectedProject.problem} /><CaseFact label="My role" text={selectedProject.role} /><CaseFact label="My contribution" text={selectedProject.contribution} /></div><div className="case-section"><span className="case-label">Architecture</span><div className="architecture-flow">{selectedProject.architecture.map((item, index) => <div key={item}><span>{String(index + 1).padStart(2, "0")}</span><strong>{item}</strong>{index < selectedProject.architecture.length - 1 && <i aria-hidden="true">→</i>}</div>)}</div></div><div className="case-grid detail-grid"><CaseFact label="Core solution" text={selectedProject.solution} /><CaseFact label="Security & reliability" text={selectedProject.reliability} /><CaseFact label="Challenge" text={selectedProject.challenges} /><CaseFact label="Trade-off" text={selectedProject.tradeoffs} /><CaseFact label="Testing & validation" text={selectedProject.testing} /><CaseFact label="Result" text={selectedProject.result} /></div><div className="case-section"><span className="case-label">Technologies</span><div className="tag-row modal-tags">{selectedProject.stack.map((tech) => <span key={tech}>{tech}</span>)}</div></div><div className="modal-actions">{selectedProject.live && <a className="button button-primary" href={selectedProject.live} target="_blank" rel="noopener noreferrer">View live <ArrowIcon /></a>}{selectedProject.github && <a className="button button-ghost" href={selectedProject.github} target="_blank" rel="noopener noreferrer">View repository <ArrowIcon /></a>}{!selectedProject.github && <span className="private-note">Private project · no repository link exposed</span>}</div></section></div>}
+      {selectedProject && <div className="modal-backdrop" role="presentation" onMouseDown={() => setSelectedProject(null)}><section className="case-modal" role="dialog" aria-modal="true" aria-labelledby="case-title" onMouseDown={(event) => event.stopPropagation()}><button className="modal-close" type="button" onClick={() => setSelectedProject(null)} aria-label="Close case study" autoFocus>×</button><div className="modal-heading"><span className="eyebrow">{selectedProject.type} case study</span><h2 id="case-title">{selectedProject.name}</h2><p>{selectedProject.tagline}</p></div><div className="case-grid"><CaseFact label="Context" text={selectedProject.summary} /><CaseFact label="The problem" text={selectedProject.problem} /><CaseFact label="My role" text={selectedProject.role} /><CaseFact label="My contribution" text={selectedProject.contribution} /></div><div className="case-section"><span className="case-label">Architecture</span><div className="architecture-flow">{selectedProject.architecture.map((item, index) => <div key={item}><span>{String(index + 1).padStart(2, "0")}</span><strong>{item}</strong>{index < selectedProject.architecture.length - 1 && <i aria-hidden="true">→</i>}</div>)}</div></div><div className="case-grid detail-grid"><CaseFact label="Core solution" text={selectedProject.solution} /><CaseFact label="Security & reliability" text={selectedProject.reliability} /><CaseFact label="Challenge" text={selectedProject.challenges} /><CaseFact label="Trade-off" text={selectedProject.tradeoffs} /><CaseFact label="Testing & validation" text={selectedProject.testing} /><CaseFact label="Result" text={selectedProject.result} /></div><div className="case-section"><span className="case-label">Technologies</span><div className="tag-row modal-tags">{selectedProject.stack.map((tech) => <span key={tech}>{tech}</span>)}</div></div>{selectedProject.live && <div className="modal-actions"><a className="button button-primary" href={selectedProject.live} target="_blank" rel="noopener noreferrer">View live <ArrowIcon /></a></div>}</section></div>}
 
       {isCvModalOpen && (
         <div className="modal-backdrop" role="presentation" onMouseDown={() => setIsCvModalOpen(false)}>
@@ -723,7 +708,7 @@ export default function Home() {
         </div>
       )}
 
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ "@context": "https://schema.org", "@type": "Person", name: "Md. Tasfiq Tasin", jobTitle: "AI-Focused Backend Developer | Full-Stack & Flutter App Developer", email: `mailto:${LINKS.email}`, sameAs: [LINKS.github, LINKS.linkedin], alumniOf: { "@type": "CollegeOrUniversity", name: "BRAC University" }, knowsAbout: ["FastAPI", "Flutter", "LLM integration", "RAG", "React", "Supabase"], subjectOf: projects.map((project) => ({ "@type": "CreativeWork", name: project.name, description: project.summary, ...(project.github ? { url: project.github } : {}) })) }) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ "@context": "https://schema.org", "@type": "Person", name: "Md. Tasfiq Tasin", jobTitle: "AI-Focused Backend Developer | Full-Stack & Flutter App Developer", email: `mailto:${LINKS.email}`, sameAs: [LINKS.linkedin], alumniOf: { "@type": "CollegeOrUniversity", name: "BRAC University" }, knowsAbout: ["FastAPI", "Flutter", "LLM integration", "RAG", "React", "Supabase"], subjectOf: projects.map((project) => ({ "@type": "CreativeWork", name: project.name, description: project.summary })) }) }} />
     </>
   );
 }

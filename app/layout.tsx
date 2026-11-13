@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   title: "Md. Tasfiq Tasin — AI-Focused Backend, Full-Stack & Flutter Developer",
   description: "Md. Tasfiq Tasin builds practical AI-powered web and mobile products with secure backend APIs, databases, Flutter and context-aware LLM workflows.",
   keywords: ["Md. Tasfiq Tasin", "AI-focused backend developer", "Flutter developer", "FastAPI", "LLM integration", "RAG", "Bangladesh"],
-  authors: [{ name: "Md. Tasfiq Tasin", url: "https://github.com/muhammadTasin" }],
+  authors: [{ name: "Md. Tasfiq Tasin" }],
   alternates: { canonical: siteUrl },
   openGraph: {
     title: "Md. Tasfiq Tasin — AI-Focused Backend, Full-Stack & Flutter Developer",
